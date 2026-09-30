@@ -1,6 +1,7 @@
 packages:
   - shared
   - solar-dex
+  - earth-moon
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver

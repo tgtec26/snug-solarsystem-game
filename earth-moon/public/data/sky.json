@@ -1,0 +1,114 @@
+{
+  "zodiac": [
+    {
+      "month": 1,
+      "id": "sagittarius",
+      "name": "궁수자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 2,
+      "id": "capricorn",
+      "name": "염소자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 3,
+      "id": "aquarius",
+      "name": "물병자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 4,
+      "id": "pisces",
+      "name": "물고기자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 5,
+      "id": "aries",
+      "name": "양자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 6,
+      "id": "taurus",
+      "name": "황소자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 7,
+      "id": "gemini",
+      "name": "쌍둥이자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 8,
+      "id": "cancer",
+      "name": "게자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 9,
+      "id": "leo",
+      "name": "사자자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 10,
+      "id": "virgo",
+      "name": "처녀자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 11,
+      "id": "libra",
+      "name": "천칭자리",
+      "page": 247,
+      "verified": true
+    },
+    {
+      "month": 12,
+      "id": "scorpio",
+      "name": "전갈자리",
+      "page": 247,
+      "verified": true
+    }
+  ],
+  "boards": [
+    {
+      "id": "sagittarius",
+      "name": "궁수자리",
+      "label": "가",
+      "page": 246
+    },
+    {
+      "id": "pisces",
+      "name": "물고기자리",
+      "label": "나",
+      "page": 246
+    },
+    {
+      "id": "gemini",
+      "name": "쌍둥이자리",
+      "label": "다",
+      "page": 246
+    },
+    {
+      "id": "virgo",
+      "name": "처녀자리",
+      "label": "라",
+      "page": 246
+    }
+  ]
+}

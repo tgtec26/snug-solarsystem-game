@@ -1,0 +1,52 @@
+{
+  "positions": [
+    {
+      "pos": 1,
+      "name": "삭",
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 2,
+      "name": "초승달",
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 3,
+      "name": "상현달",
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 4,
+      "name": null,
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 5,
+      "name": "보름달",
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 6,
+      "name": null,
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 7,
+      "name": "하현달",
+      "page": 249,
+      "verified": true
+    },
+    {
+      "pos": 8,
+      "name": "그믐달",
+      "page": 249,
+      "verified": true
+    }
+  ]
+}

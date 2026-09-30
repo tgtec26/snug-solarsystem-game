@@ -1,0 +1,10 @@
+{
+  "inputLockMs": 1000,
+  "stars": {
+    "two": 0.6,
+    "three": 0.9
+  },
+  "earthSpin": {
+    "turns": 1
+  }
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "id": "o0",
+    "title": "지구를 돌려 보자",
+    "room": "dome",
+    "minigame": "earthSpin",
+    "pages": [
+      244
+    ],
+    "requires": [],
+    "cards": []
+  },
+  {
+    "id": "o1",
+    "title": "북쪽 하늘의 회전목마",
+    "room": "dome",
+    "minigame": "dayStars",
+    "pages": [
+      244,
+      245
+    ],
+    "requires": [
+      "o0"
+    ],
+    "cards": [
+      "sky-diurnal"
+    ]
+  },
+  {
+    "id": "o2",
+    "title": "생일 무렵의 별자리",
+    "room": "dome",
+    "minigame": "constellation",
+    "pages": [
+      246,
+      247
+    ],
+    "requires": [
+      "o1"
+    ],
+    "cards": [
+      "sky-annual",
+      "board-sagittarius",
+      "board-pisces",
+      "board-gemini",
+      "board-virgo",
+      "zodiac-sagittarius",
+      "zodiac-capricorn",
+      "zodiac-aquarius",
+      "zodiac-pisces",
+      "zodiac-aries",
+      "zodiac-taurus",
+      "zodiac-gemini",
+      "zodiac-cancer",
+      "zodiac-leo",
+      "zodiac-virgo",
+      "zodiac-libra",
+      "zodiac-scorpio"
+    ]
+  },
+  {
+    "id": "o3",
+    "title": "달이 모양을 바꾼 날",
+    "room": "workshop",
+    "minigame": "moonPhase",
+    "pages": [
+      248,
+      249,
+      250
+    ],
+    "requires": [
+      "o2"
+    ],
+    "cards": [
+      "phase-new",
+      "phase-crescent",
+      "phase-first-quarter",
+      "phase-full",
+      "phase-last-quarter",
+      "phase-waning-crescent"
+    ]
+  },
+  {
+    "id": "o4",
+    "title": "그림자가 진 날",
+    "room": "workshop",
+    "minigame": "shadow",
+    "pages": [
+      251,
+      252,
+      253
+    ],
+    "requires": [
+      "o3"
+    ],
+    "cards": [
+      "eclipse-solar-total",
+      "eclipse-solar-partial",
+      "eclipse-lunar-total",
+      "eclipse-lunar-partial"
+    ]
+  }
+]

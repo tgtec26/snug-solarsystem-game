@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev:dex": "pnpm --filter solar-dex dev",
+    "dev:moon": "pnpm --filter earth-moon dev",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck"
   },
