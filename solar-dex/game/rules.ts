@@ -57,3 +57,39 @@ export function orderUnlocked(orders: Order[], id: string, completed: string[]):
 export function allOrdersDone(orders: Order[], completed: string[]): boolean {
   return orders.every(o => completed.includes(o.id));
 }
+
+/** 카드 n장을 뽑는다: 천체마다 1장 이상(가능한 만큼), 나머지는 무작위. rng는 0~1 난수 함수 */
+export function pickTraitCards(data: BodiesData, n: number, rng: () => number = Math.random): string[] {
+  const shuffle = <T,>(a: T[]) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+  const chosen: string[] = [];
+  data.bodies.forEach(b => { const c = shuffle(data.traits.filter(t => t.body === b.id))[0]; if (c) chosen.push(c.id); });
+  const rest = shuffle(data.traits.filter(t => !chosen.includes(t.id)).map(t => t.id));
+  return shuffle([...chosen, ...rest].slice(0, Math.max(n, chosen.length)));
+}
+
+/** 행성 나눔판: 상자 두 개. 같은 무리끼리만 한 상자에 모은다 (235쪽) */
+export function sortPlacement(data: BodiesData, boxes: Record<'A' | 'B', string[]>, planetId: string, box: 'A' | 'B'): { ok: boolean; reason: string } {
+  const g = planetGroup(data, planetId);
+  const other = box === 'A' ? 'B' : 'A';
+  const groupOf = (list: string[]) => (list.length ? planetGroup(data, list[0]) : null);
+  const here = groupOf(boxes[box]);
+  const there = groupOf(boxes[other]);
+  if (here !== null && here !== g) return { ok: false, reason: '특징이 다른 행성이에요' };
+  if (here === null && there === g) return { ok: false, reason: '같은 무리는 한 상자에 모아요' };
+  return { ok: true, reason: '' };
+}
+
+/** 혜성 꼬리 방향(도, 화면 좌표: 오른쪽 0°, 아래 90°). 태양에서 혜성을 향한 방향 = 태양 반대쪽 (230쪽) */
+export function tailAngle(sun: { x: number; y: number }, comet: { x: number; y: number }): number {
+  return (Math.atan2(comet.y - sun.y, comet.x - sun.x) * 180) / Math.PI;
+}
+/** 꼬리 각도가 태양 반대쪽과 허용 오차 안이면 true */
+export function tailPointsAway(sun: { x: number; y: number }, comet: { x: number; y: number }, angle: number, tol: number): boolean {
+  const d = Math.abs(((angle - tailAngle(sun, comet) + 540) % 360) - 180);
+  return d <= tol;
+}
+
+/** 활동 예보: 영향 카드는 정해진 지구 지도 자리에만 붙는다 (239쪽) */
+export function effectZoneOk(sun: SunData, effectId: string, zone: string): boolean {
+  return sun.effects.find(e => e.id === effectId)?.zone === zone;
+}

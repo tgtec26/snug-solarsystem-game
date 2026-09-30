@@ -2,10 +2,35 @@
   "maxLevel": 4,
   "activeLevel": 3,
   "effects": [
-    { "id": "aurora", "name": "오로라", "page": 239 },
-    { "id": "radio", "name": "무선 통신 오류", "page": 239 },
-    { "id": "satellite", "name": "인공위성 고장", "page": 239 },
-    { "id": "power", "name": "송전 시설 고장", "page": 239 },
-    { "id": "radiation", "name": "태양 방사선 노출", "page": 239 }
+    {
+      "id": "aurora",
+      "name": "오로라",
+      "page": 239,
+      "zone": "sky"
+    },
+    {
+      "id": "radio",
+      "name": "무선 통신 오류",
+      "page": 239,
+      "zone": "tower"
+    },
+    {
+      "id": "satellite",
+      "name": "인공위성 고장",
+      "page": 239,
+      "zone": "orbit"
+    },
+    {
+      "id": "power",
+      "name": "송전 시설 고장",
+      "page": 239,
+      "zone": "grid"
+    },
+    {
+      "id": "radiation",
+      "name": "태양 방사선 노출",
+      "page": 239,
+      "zone": "route"
+    }
   ]
 }

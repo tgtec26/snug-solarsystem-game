@@ -85,3 +85,47 @@ describe('의뢰 흐름', () => {
     expect(new Set(cards).size).toBe(21);
   });
 });
+
+import { pickTraitCards, sortPlacement, tailAngle, tailPointsAway, effectZoneOk } from '@/game/rules';
+
+describe('식구 카드 뽑기', () => {
+  it('9장을 뽑고 중복 없이, 모든 천체가 최소 1장 포함', () => {
+    const ids = pickTraitCards(B, 9, () => 0.42);
+    expect(ids).toHaveLength(9);
+    ids.forEach(id => expect(B.traits.some(t => t.id === id)).toBe(true));
+    expect(new Set(ids).size).toBe(9);
+    B.bodies.forEach(b => expect(ids.some(id => matchTrait(B, id, b.id))).toBe(true));
+  });
+});
+
+describe('행성 나눔판 (235쪽)', () => {
+  const boxes = { A: [] as string[], B: [] as string[] };
+  it('빈 상자에는 아무 행성이나, 같은 무리는 같은 상자에', () => {
+    expect(sortPlacement(B, boxes, 'earth', 'A').ok).toBe(true);
+    expect(sortPlacement(B, { A: ['earth'], B: [] }, 'mars', 'A').ok).toBe(true);
+  });
+  it('다른 무리를 섞거나, 같은 무리를 다른 상자에 나누면 거부', () => {
+    expect(sortPlacement(B, { A: ['earth'], B: [] }, 'jupiter', 'A').ok).toBe(false);
+    expect(sortPlacement(B, { A: ['earth'], B: [] }, 'mars', 'B').ok).toBe(false);
+    expect(sortPlacement(B, { A: ['earth'], B: [] }, 'jupiter', 'B').ok).toBe(true);
+  });
+});
+
+describe('혜성 꼬리 방향 (230쪽)', () => {
+  const sunP = { x: 0, y: 0 };
+  it('태양에서 혜성을 향한 방향이 꼬리 방향', () => {
+    expect(tailAngle(sunP, { x: 10, y: 0 })).toBeCloseTo(0);
+    expect(tailAngle(sunP, { x: 0, y: 10 })).toBeCloseTo(90);
+  });
+  it('허용 오차 안이면 통과, 반대(태양 쪽)면 실패', () => {
+    expect(tailPointsAway(sunP, { x: 10, y: 0 }, 10, 25)).toBe(true);
+    expect(tailPointsAway(sunP, { x: 10, y: 0 }, 180, 25)).toBe(false);
+    expect(tailPointsAway(sunP, { x: 10, y: 0 }, 350, 25)).toBe(true);
+  });
+});
+
+describe('활동 예보 자리 (239쪽)', () => {
+  it('영향마다 정해진 자리에만 붙는다', () => {
+    S.effects.forEach(e => S.effects.forEach(z => expect(effectZoneOk(S, e.id, z.zone)).toBe(e.id === z.id)));
+  });
+});

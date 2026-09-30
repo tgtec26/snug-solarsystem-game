@@ -1,4 +1,19 @@
 {
   "inputLockMs": 1000,
-  "stars": { "two": 0.6, "three": 0.9 }
+  "stars": {
+    "two": 0.6,
+    "three": 0.9
+  },
+  "bodies": {
+    "cards": 9
+  },
+  "comet": {
+    "tolerance": 25,
+    "ranks": [
+      0,
+      1,
+      2,
+      3
+    ]
+  }
 }

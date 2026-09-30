@@ -38,6 +38,7 @@ export function validateSun(d: SunData): string[] {
   if (!isNum(d.maxLevel) || d.maxLevel < 1) errs.push('sun: maxLevel은 1 이상');
   if (!isNum(d.activeLevel) || d.activeLevel < 1 || d.activeLevel > d.maxLevel) errs.push('sun: activeLevel은 1~maxLevel');
   if (d.effects.length !== 5) errs.push('sun: 지구 영향은 5가지 (239쪽)');
+  else if (new Set(d.effects.map(e => e.zone)).size !== 5 || !d.effects.every(e => isStr(e.zone))) errs.push('sun: 영향마다 서로 다른 지구 지도 자리(zone) 필요');
   return errs;
 }
 
@@ -83,6 +84,9 @@ export function validateMinigame(c: MinigameConfig): string[] {
   if (!c.stars || !isNum(c.stars.two) || !isNum(c.stars.three) || !(c.stars.two < c.stars.three) || c.stars.three > 1 || c.stars.two <= 0) {
     errs.push('minigame: stars는 0 < two < three ≤ 1');
   }
+  if (!c.bodies || !isNum(c.bodies.cards) || c.bodies.cards < 6 || c.bodies.cards > 11) errs.push('minigame: bodies.cards는 6~11');
+  if (!c.comet || !isNum(c.comet.tolerance) || c.comet.tolerance <= 0 || c.comet.tolerance > 60) errs.push('minigame: comet.tolerance는 0~60');
+  if (!c.comet || !Array.isArray(c.comet.ranks) || c.comet.ranks.length < 2 || !c.comet.ranks.every(isNum)) errs.push('minigame: comet.ranks 2개 이상');
   return errs;
 }
 

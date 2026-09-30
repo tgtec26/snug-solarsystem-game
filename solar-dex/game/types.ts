@@ -7,7 +7,7 @@ export interface Group { id: string; name: string; values: Record<string, string
 export interface Planet { id: string; name: string; group: string }
 export interface BodiesData { bodies: Body[]; traits: Trait[]; criteria: Criterion[]; groups: Group[]; planets: Planet[] }
 
-export interface SunEffect { id: string; name: string; page: number }
+export interface SunEffect { id: string; name: string; page: number; zone: string }
 export interface SunData { maxLevel: number; activeLevel: number; effects: SunEffect[] }
 
 export interface Order {
@@ -16,6 +16,10 @@ export interface Order {
 }
 
 export interface DialogConfig { npcName: string; intro: string[]; orders: Record<string, string>; ending: string[] }
-export interface MinigameConfig { inputLockMs: number; stars: { two: number; three: number } }
+export interface MinigameConfig {
+  inputLockMs: number; stars: { two: number; three: number };
+  bodies: { cards: number };
+  comet: { tolerance: number; ranks: number[] };
+}
 
 export interface SunLevels { sunspots: number; prominence: number; flare: number; corona: number; wind: number }
