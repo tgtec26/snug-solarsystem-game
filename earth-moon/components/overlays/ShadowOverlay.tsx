@@ -90,13 +90,13 @@ export function ShadowOverlay({ onDone }: { onDone: (stars: number) => void }) {
         {/* 손전등 빛 */}
         <polygon points={`${SUN.x},${SUN.y - 36} ${SUN.x},${SUN.y + 36} 780,560 780,40`} fill="#ffd16614" />
         {kind && <line x1={SUN.x} y1={SUN.y} x2={far.x} y2={far.y} stroke="#86efac" strokeWidth="3" strokeDasharray="8 8" opacity="0.8" />}
-        <rect x="30" y="278" width="70" height="44" rx="14" fill="#64748b" />
-        <circle cx={SUN.x} cy={SUN.y} r="26" fill="#ffd166" />
+        <image href="/assets/flashlight.webp" x="10" y="270" width="110" height="47" />
+        <image href="/assets/sun.webp" x={SUN.x - 6} y={SUN.y - 34} width="68" height="68" />
         {/* 지구와 달: 집어 올리면 그림자가 멀어지고 살짝 커진다 */}
         <ellipse cx={earth.x + 6} cy={earth.y + RE + 10} rx={RE * 0.9} ry="12" fill="#000" opacity={grab === 'earth' ? 0.25 : 0.5} />
         <ellipse cx={moon.x + 4} cy={moon.y + RM + 8} rx={RM * 0.9} ry="8" fill="#000" opacity={grab === 'moon' ? 0.25 : 0.5} />
         {[{ k: 'earth', p: earth, r: RE, f: 'url(#eg)' }, { k: 'moon', p: moon, r: RM, f: 'url(#mg)' }].sort((a, b) => a.p.y - b.p.y).map(o => (
-          <circle key={o.k} cx={o.p.x} cy={o.p.y + lift(grab === o.k)} r={o.r * (grab === o.k ? 1.08 : 1)} fill={o.f} className={grab === o.k ? '' : 'cursor-grab'} />
+          <image key={o.k} href={o.k === 'earth' ? '/assets/earth-ball.webp' : '/assets/moon-ball.webp'} x={o.p.x - o.r * (grab === o.k ? 1.08 : 1)} y={o.p.y + lift(grab === o.k) - o.r * (grab === o.k ? 1.08 : 1)} width={o.r * 2 * (grab === o.k ? 1.08 : 1)} height={o.r * 2 * (grab === o.k ? 1.08 : 1)} className={grab === o.k ? '' : 'cursor-grab'} />
         ))}
         {kind && (
           <g clipPath="url(#farClip)">

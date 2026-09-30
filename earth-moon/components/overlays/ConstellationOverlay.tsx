@@ -71,7 +71,7 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
       <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <ellipse cx={C.x} cy="570" rx="250" ry="18" fill="#000" opacity="0.4" />
         {/* 전등(태양) */}
-        <circle cx={C.x} cy={C.y} r="46" fill="#ffd16644" /><circle cx={C.x} cy={C.y} r="26" fill="#ffd166" />
+        <image href="/assets/sun.webp" x={C.x - 50} y={C.y - 50} width="100" height="100" />
         {phase === 'chair' ? (
           <>
             <circle cx={C.x} cy={C.y} r="130" fill="none" stroke="#ffffff33" strokeDasharray="6 8" strokeWidth="3" />
@@ -87,7 +87,7 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
             {(() => { const p = pt(boardAngle(seat), 130); return (
               <g>
                 <ellipse cx={p.x + 4} cy={p.y + 26} rx="20" ry="7" fill="#000" opacity="0.5" />
-                <circle cx={p.x} cy={p.y} r="22" fill="#fde68a" stroke="#92400e" strokeWidth="5" className={flash ? 'anim-pop' : 'cursor-grab'} style={{ transformOrigin: `${p.x}px ${p.y}px` }} />
+                <image href="/assets/observer.webp" x={p.x - 28} y={p.y - 76} width="56" height="84" className={flash ? 'anim-pop' : 'cursor-grab'} style={{ transformOrigin: `${p.x}px ${p.y}px` }} />
               </g>); })()}
             <path d={`M${C.x + 60} ${C.y - 70} A 90 90 0 0 0 ${C.x - 70} ${C.y - 60}`} stroke="#fde68a" strokeWidth="8" fill="none" strokeLinecap="round" className="animate-pulse" opacity={round === 0 && seat === 0 ? 1 : 0} />
             {/* 한밤중 하늘 창 */}
@@ -111,7 +111,7 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
             {(() => { const e = pt(monthAngle(month) + 180, 150); return (
               <g>
                 <line x1={C.x} y1={C.y} x2={pt(monthAngle(month), 200).x} y2={pt(monthAngle(month), 200).y} stroke="#ffd16688" strokeWidth="3" strokeDasharray="4 6" />
-                <circle cx={e.x} cy={e.y} r="22" fill="#2b6cb0" stroke="#fff" strokeWidth="3" />
+                <image href="/assets/earth-ball.webp" x={e.x - 24} y={e.y - 24} width="48" height="48" />
               </g>); })()}
           </>
         )}

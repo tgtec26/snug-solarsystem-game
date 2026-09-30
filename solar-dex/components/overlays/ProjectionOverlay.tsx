@@ -116,6 +116,7 @@ export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void 
         <g data-drop="tube" onClick={() => placeSelected('tube')} className={stage === 'plate' ? 'cursor-pointer' : ''}>
           <rect x="60" y="130" width="120" height="250" rx="22" fill="#64748b" stroke={stage === 'plate' ? '#fde68a' : '#94a3b8'} strokeWidth="6" strokeDasharray={stage === 'plate' ? '10 8' : undefined} />
           {stage !== 'plate' && <circle cx="120" cy="255" r="40" fill="#0f172a" className="anim-pop" style={{ transformOrigin: '120px 255px' }} />}
+          <image href="/assets/telescope.webp" x="8" y="392" width="186" height="198" opacity="0.95" />
         </g>
       </svg>
       <div className="flex items-center gap-6 h-16">

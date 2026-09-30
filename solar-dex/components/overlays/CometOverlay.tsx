@@ -53,7 +53,7 @@ export function CometOverlay({ onDone }: { onDone: (stars: number) => void }) {
       <div className="text-3xl font-bold">꼬리를 돌려 맞춰요 ({step + 1}/{STATIONS.length})</div>
       <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-black/30" tabIndex={0} onKeyDown={aimKey} onPointerMove={move} onPointerDown={e => { (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); move(e); }}>
         <ellipse cx="400" cy="300" rx="240" ry="180" fill="none" stroke="#ffffff33" strokeDasharray="6 8" strokeWidth="3" />
-        <circle cx={SUN.x} cy={SUN.y} r="36" fill="#ffd166" />
+        <image href="/assets/sun.webp" x={SUN.x - 52} y={SUN.y - 52} width="104" height="104" />
         <line x1={SUN.x} y1={SUN.y} x2={comet.x} y2={comet.y} stroke="#ffd16655" strokeWidth="2" strokeDasharray="4 6" />
         <path d={`M${comet.x} ${comet.y} L${end.x} ${end.y}`} stroke={ok ? '#86efac' : '#7dd3fc'} strokeWidth="14" strokeLinecap="round" opacity="0.7" />
         <circle cx={comet.x} cy={comet.y} r="14" fill="#e0f2fe" />

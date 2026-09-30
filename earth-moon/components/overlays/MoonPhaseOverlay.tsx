@@ -60,11 +60,10 @@ export function MoonPhaseOverlay({ onDone }: { onDone: (stars: number) => void }
       <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <defs><linearGradient id="beam" x1="1" x2="0"><stop offset="0" stopColor="#ffd16655" /><stop offset="1" stopColor="#ffd16600" /></linearGradient></defs>
         <rect x="430" y="60" width="370" height="480" fill="url(#beam)" />
-        <circle cx="730" cy="300" r="52" fill="#ffd166" />
+        <image href="/assets/sun.webp" x="670" y="240" width="120" height="120" />
         <ellipse cx={E.x} cy={E.y + ORBIT + 36} rx="170" ry="16" fill="#000" opacity="0.4" />
         <circle cx={E.x} cy={E.y} r={ORBIT} fill="none" stroke="#ffffff33" strokeDasharray="6 8" strokeWidth="3" />
-        <circle cx={E.x} cy={E.y} r="34" fill="#2b6cb0" />
-        <ellipse cx={E.x - 6} cy={E.y - 4} rx="14" ry="10" fill="#48a15a" />
+        <image href="/assets/earth-ball.webp" x={E.x - 38} y={E.y - 38} width="76" height="76" />
         {Array.from({ length: 8 }).map((_, i) => {
           const p = at(i + 1, ORBIT); const n = at(i + 1, ORBIT + 60); const name = moon.positions[i].name;
           const slot = stage === 'label' && name;

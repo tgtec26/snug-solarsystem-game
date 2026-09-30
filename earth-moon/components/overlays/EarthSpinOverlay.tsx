@@ -7,7 +7,6 @@ import { isEastward, spinAccumulate, spinDone, starsFor } from '@/game/rules';
 const C = { x: 400, y: 290 };
 const R = 150;
 const norm = (d: number) => ((d + 540) % 360) - 180;
-const BLOBS = [[-40, -60, 46, 34], [50, -20, 38, 50], [-30, 50, 50, 30], [70, 60, 28, 22]];
 const STARS = Array.from({ length: 26 }, (_, i) => ({ x: (i * 137) % 800, y: 40 + ((i * 71) % 230), r: i % 4 === 0 ? 3 : 1.8 }));
 
 /** 지구 자전 돌리기 (244쪽): 지구를 끌어 서→동으로 돌리면 지구 시점의 별이 동→서로 흐른다. 한 바퀴 돌리고 시점을 한 번 바꾸면 통과. */
@@ -78,13 +77,11 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
         {view === 'space' ? (
           <>
             {STARS.map((s, i) => <circle key={i} cx={s.x} cy={s.y + 120} r={s.r} fill="#fff" opacity="0.5" />)}
-            <circle cx="90" cy="290" r="44" fill="#ffd166" /><circle cx="90" cy="290" r="62" fill="#ffd16633" />
+            <image href="/assets/sun.webp" x="20" y="220" width="140" height="140" />
             <ellipse cx={C.x} cy={C.y + R + 26} rx={R * 0.9} ry="16" fill="#000" opacity="0.4" />
             <circle cx={C.x} cy={C.y} r={R + 14 + progress * 10} fill="none" stroke="#86efac" strokeWidth="6" strokeDasharray={`${progress * 2 * Math.PI * (R + 18)} 9999`} transform={`rotate(-90 ${C.x} ${C.y})`} />
             <g transform={`rotate(${rot} ${C.x} ${C.y})`}>
-              <circle cx={C.x} cy={C.y} r={R} fill="#2b6cb0" />
-              {BLOBS.map(([x, y, w, h], i) => <ellipse key={i} cx={C.x + x} cy={C.y + y} rx={w} ry={h} fill="#48a15a" />)}
-              <circle cx={C.x} cy={C.y} r="7" fill="#fff" />
+              <image href="/assets/earth-top.webp" x={C.x - R} y={C.y - R} width={R * 2} height={R * 2} />
             </g>
             <circle cx={obs.x} cy={obs.y} r="12" fill="#fde68a" stroke="#92400e" strokeWidth="4" />
             {total < 30 && (
