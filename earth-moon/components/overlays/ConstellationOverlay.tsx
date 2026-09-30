@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
@@ -36,8 +37,8 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
   const confirmSeat = (s: number) => {
     if (phase !== 'chair' || flash) return;
     const v = chairBoards(sky, sky.boards[s].id)!;
-    if (v.night !== target) { setMistakes(m => m + 1); setMsg('전등 건너편 판은 빛에 가려서 안 보여요'); return; }
-    setMsg(''); setFlash(true);
+    if (v.night !== target) { setMistakes(m => m + 1); sfx.error(); setMsg('전등 건너편 판은 빛에 가려서 안 보여요'); return; }
+    setMsg(''); setFlash(true); sfx.correct();
     window.setTimeout(() => { setFlash(false); if (round + 1 >= targets.length) setPhase('ring'); else setRound(round + 1); }, 1000);
   };
   const angleAt = (e: PointerEvent) => {
@@ -56,10 +57,10 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
 
   const { drag, selected, bindCard, placeSelected } = useDragDrop((id, slot) => {
     const m = Number(slot.replace('slot-', ''));
-    if (!zodiacSlotOk(sky, id, m)) { setMistakes(x => x + 1); setMsg('태양은 별자리 사이를 서쪽에서 동쪽으로 지나요'); return; }
+    if (!zodiacSlotOk(sky, id, m)) { setMistakes(x => x + 1); sfx.error(); setMsg('태양은 별자리 사이를 서쪽에서 동쪽으로 지나요'); return; }
     setMsg('');
     const next = { ...placed, [m]: id };
-    setPlaced(next);
+    setPlaced(next); sfx.correct();
     if (Object.keys(next).length === sky.zodiac.length) window.setTimeout(() => onDone(starsFor(TOTAL / (TOTAL + mistakes), mistakes === 0, cfg)), 1100);
   }, phase === 'ring');
   const nameOf = (id: string) => sky.zodiac.find(z => z.id === id)!.name;

@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useState } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
@@ -20,10 +21,10 @@ export function ForecastOverlay({ onDone }: { onDone: (stars: number) => void })
   const eff = (id: string) => sun.effects.find(e => e.id === id)!;
 
   const { drag, selected, bindCard, placeSelected } = useDragDrop((effectId, zone) => {
-    if (!effectZoneOk(sun, effectId, zone)) { setMistakes(m => m + 1); setMsg('그 영향은 다른 곳에서 일어나요'); return; }
+    if (!effectZoneOk(sun, effectId, zone)) { setMistakes(m => m + 1); sfx.error(); setMsg('그 영향은 다른 곳에서 일어나요'); return; }
     setMsg('');
     const next = { ...placed, [zone]: effectId };
-    setPlaced(next);
+    setPlaced(next); sfx.correct();
     if (Object.keys(next).length === sun.effects.length) window.setTimeout(() => onDone(starsFor((sun.effects.length - mistakes) / sun.effects.length, mistakes === 0, cfg)), 1000);
   }, active.length > 0);
 

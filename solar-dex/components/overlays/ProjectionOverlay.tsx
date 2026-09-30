@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
@@ -33,7 +34,7 @@ export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void 
 
   const { drag: card, selected, bindCard, placeSelected } = useDragDrop((_id, target) => {
     if (target !== 'tube') return;
-    setStage('aim'); setMsg('');
+    setStage('aim'); setMsg(''); sfx.correct();
   }, stage === 'plate');
 
   const toSvg = (e: PointerEvent) => {
@@ -42,17 +43,17 @@ export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void 
   };
   const down = (e: PointerEvent<SVGSVGElement>) => {
     const pt = toSvg(e);
-    if (stage === 'plate') { const c = safetyCheck('aim-sun-without-filter'); setMistakes(m => m + 1); setMsg(`${c.reason}. 차단판부터 끼워요`); return; }
+    if (stage === 'plate') { const c = safetyCheck('aim-sun-without-filter'); setMistakes(m => m + 1); sfx.error(); setMsg(`${c.reason}. 차단판부터 끼워요`); return; }
     if (stage === 'aim') {
       (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId);
       drag.current = { sx: pt.x, sy: pt.y, ox: pan.x, oy: pan.y };
     }
     if (stage === 'find') {
       const hit = SPOTS.find(s => !found.includes(s.id) && distance(pt, { x: img.x + s.dx, y: img.y + s.dy }) <= 30);
-      if (!hit) { if (distance(pt, C) < PAPER_R) { setMistakes(m => m + 1); setMsg('어두운 점이나 알갱이 무늬를 찾아요'); } return; }
+      if (!hit) { if (distance(pt, C) < PAPER_R) { setMistakes(m => m + 1); sfx.error(); setMsg('어두운 점이나 알갱이 무늬를 찾아요'); } return; }
       setMsg('');
       const next = [...found, hit.id];
-      setFound(next);
+      setFound(next); sfx.correct();
       if (next.length === SPOTS.length) window.setTimeout(() => onDone(starsFor(SPOTS.length / (SPOTS.length + mistakes), mistakes === 0, cfg)), 1100);
     }
   };

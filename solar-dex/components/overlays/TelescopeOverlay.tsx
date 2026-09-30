@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDataStore } from '@/game/dataStore';
 import { distance, focusSharp, photoAccuracy, starsFor, telescopeSunCheck } from '@/game/rules';
@@ -42,7 +43,7 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
     for (let i = 1; i <= steps; i++) {
       const q = { x: pan.x + ((next.x - pan.x) * i) / steps, y: pan.y + ((next.y - pan.y) * i) / steps };
       const check = telescopeSunCheck({ x: SUN_WORLD.x + q.x, y: SUN_WORLD.y + q.y }, C, t.sunGuard);
-      if (!check.ok) { setMistakes(m => m + 1); setMsg(check.reason); return false; }
+      if (!check.ok) { setMistakes(m => m + 1); sfx.error(); setMsg(check.reason); return false; }
     }
     setMsg(''); setPan(next); return true;
   };
@@ -89,10 +90,10 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
 
   const shoot = () => {
     if (stage !== 'focus') return;
-    if (sharp < 0.5) { setMistakes(m => m + 1); setMsg('초점이 흐려요'); return; }
+    if (sharp < 0.5) { setMistakes(m => m + 1); sfx.error(); setMsg('초점이 흐려요'); return; }
     const acc = photoAccuracy(aimDist, t.aimRadius, sharp);
     const next = [...scores, acc];
-    setScores(next); setMsg(''); setStage('shot');
+    setScores(next); setMsg(''); setStage('shot'); sfx.correct();
     window.setTimeout(() => {
       if (idx + 1 >= TARGETS.length) onDone(starsFor(next.reduce((a, b) => a + b, 0) / next.length, mistakes === 0, cfg));
       else { setIdx(idx + 1); setPan({ x: 0, y: 0 }); setFocus(0.05); setStage('aim'); }

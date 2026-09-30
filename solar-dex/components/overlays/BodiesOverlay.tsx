@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useMemo, useState } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
@@ -24,10 +25,10 @@ export function BodiesOverlay({ onDone }: { onDone: (stars: number) => void }) {
       const left = cards.filter(c => c !== cardId);
       setCards(left);
       setFlash({ id: bodyId, ok: true });
-      setMsg('');
+      setMsg(''); sfx.correct();
       if (left.length === 0) window.setTimeout(() => onDone(starsFor((total - mistakes) / total, mistakes === 0, cfg)), 900);
     } else {
-      setMistakes(m => m + 1);
+      setMistakes(m => m + 1); sfx.error();
       setFlash({ id: bodyId, ok: false });
       const owner = bodies.bodies.find(b => b.id === bodies.traits.find(t => t.id === cardId)!.body)!;
       setMsg(`그건 ${owner.name}의 특징이에요`);

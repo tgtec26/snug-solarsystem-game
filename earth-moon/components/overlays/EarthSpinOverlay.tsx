@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDataStore } from '@/game/dataStore';
 import { isEastward, spinAccumulate, spinDone, starsFor } from '@/game/rules';
@@ -29,7 +30,7 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
     const east = -screenDelta; // 화면 시계 반대 방향 = 서→동
     if (!isEastward(east)) {
       wrong.current += Math.abs(screenDelta);
-      if (wrong.current > 40) { wrong.current = 0; setMistakes(m => m + 1); setMsg('지구는 서쪽에서 동쪽으로 돌아요'); }
+      if (wrong.current > 40) { wrong.current = 0; setMistakes(m => m + 1); sfx.error(); setMsg('지구는 서쪽에서 동쪽으로 돌아요'); }
       return;
     }
     setMsg('');
@@ -38,7 +39,7 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
     if (spinDone(t, cfg.earthSpin.turns) && viewed) finish();
   };
   const finish = () => {
-    setOk(true);
+    setOk(true); sfx.correct();
     window.setTimeout(() => onDone(starsFor(1 / (1 + mistakes), mistakes === 0, cfg)), 1100);
   };
   const toggle = () => {

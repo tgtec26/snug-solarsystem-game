@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDataStore } from '@/game/dataStore';
 import { eclipseKind, starsFor, type EclipseKind } from '@/game/rules';
@@ -52,7 +53,7 @@ export function ShadowOverlay({ onDone }: { onDone: (stars: number) => void }) {
     const t = TYPES.find(x => x.k.kind === kind.kind && x.k.degree === kind.degree)!;
     if (made.includes(t.id)) return;
     const next = [...made, t.id];
-    setMade(next);
+    setMade(next); sfx.correct();
     if (next.length === TYPES.length) window.setTimeout(() => onDone(starsFor(1, misses <= 12, cfg)), 1800);
   };
   const key = (e: React.KeyboardEvent) => {

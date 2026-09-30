@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useState } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
@@ -32,8 +33,8 @@ export function PlanetSortOverlay({ onDone }: { onDone: (stars: number) => void 
     const b = box as Box;
     const res = sortPlacement(data, boxes, planetId, b);
     setFlash({ box: b, ok: res.ok });
-    if (!res.ok) { setMistakes(m => m + 1); setMsg(res.reason); return; }
-    setMsg('');
+    if (!res.ok) { setMistakes(m => m + 1); sfx.error(); setMsg(res.reason); return; }
+    setMsg(''); sfx.correct();
     const next = { ...boxes, [b]: [...boxes[b], planetId] };
     setBoxes(next);
     if (next.A.length + next.B.length === planets.length) {

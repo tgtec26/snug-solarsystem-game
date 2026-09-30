@@ -1,6 +1,7 @@
 'use client';
 
 import { requestFullscreen } from '@snug/shared/src/fullscreen';
+import { music } from '@snug/shared/src/audio';
 import { useGameStore } from '@/game/store';
 import { useDataStore } from '@/game/dataStore';
 
@@ -8,7 +9,7 @@ import { useDataStore } from '@/game/dataStore';
 export function TitleOverlay() {
   const start = useGameStore(s => s.start);
   const orders = useDataStore(s => s.orders);
-  const go = () => { requestFullscreen(); start(orders); };
+  const go = () => { requestFullscreen(); music.start(); start(orders); };
   return (
     <button
       type="button"

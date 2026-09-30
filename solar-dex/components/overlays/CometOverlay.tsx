@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDataStore } from '@/game/dataStore';
 import { cometTail, starsFor, tailAngle, tailPointsAway } from '@/game/rules';
@@ -30,13 +31,13 @@ export function CometOverlay({ onDone }: { onDone: (stars: number) => void }) {
   const confirm = () => {
     if (ok) return;
     if (tailPointsAway(SUN, comet, angle, cfg.comet.tolerance)) {
-      setOk(true); setMsg('');
+      setOk(true); setMsg(''); sfx.correct();
       window.setTimeout(() => {
         setOk(false);
         if (step + 1 >= STATIONS.length) onDone(starsFor((STATIONS.length - mistakes) / STATIONS.length, mistakes === 0, cfg));
         else { setStep(step + 1); setAngle(200); }
       }, 900);
-    } else { setMistakes(m => m + 1); setMsg('혜성 꼬리는 태양 반대쪽을 향해요'); }
+    } else { setMistakes(m => m + 1); sfx.error(); setMsg('혜성 꼬리는 태양 반대쪽을 향해요'); }
   };
   const rad = (angle * Math.PI) / 180;
   const len = 40 + tail.length * 28;

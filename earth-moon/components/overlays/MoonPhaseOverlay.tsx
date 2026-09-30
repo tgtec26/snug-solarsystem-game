@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
@@ -28,10 +29,10 @@ export function MoonPhaseOverlay({ onDone }: { onDone: (stars: number) => void }
   const go = (p: number) => { setPos(p); setSeen(s => (s.includes(p) ? s : [...s, p])); };
   const { drag, selected, bindCard, placeSelected } = useDragDrop((label, target) => {
     const p = Number(target.replace('pos-', ''));
-    if (!moonLabelOk(moon, label, p)) { setMistakes(m => m + 1); setMsg('그 위치의 모양과 달라요'); return; }
+    if (!moonLabelOk(moon, label, p)) { setMistakes(m => m + 1); sfx.error(); setMsg('그 위치의 모양과 달라요'); return; }
     setMsg('');
     const next = { ...placed, [p]: label };
-    setPlaced(next);
+    setPlaced(next); sfx.correct();
     if (Object.keys(next).length === LABELS.length) window.setTimeout(() => onDone(starsFor(LABELS.length / (LABELS.length + mistakes), mistakes === 0, cfg)), 1100);
   }, stage === 'label');
 

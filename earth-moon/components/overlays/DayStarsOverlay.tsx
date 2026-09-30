@@ -1,5 +1,6 @@
 'use client';
 
+import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDataStore } from '@/game/dataStore';
 import { rotatesCounterclockwise, starMotionOk, starsFor, type SkyDirection } from '@/game/rules';
@@ -62,10 +63,10 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
   };
   const check = (dx: number, dy: number, from: { x: number; y: number }, to: { x: number; y: number }) => {
     const ok = dir === 'north' ? rotatesCounterclockwise(POLE, from, to) : starMotionOk(dir, dx, dy, cfg.dayStars.tolerance);
-    if (!ok) { setMistakes(m => m + 1); setMsg(dir === 'north' ? '북극성을 중심으로 시계 반대 방향이에요' : '별은 동쪽에서 떠서 서쪽으로 져요'); return; }
+    if (!ok) { setMistakes(m => m + 1); sfx.error(); setMsg(dir === 'north' ? '북극성을 중심으로 시계 반대 방향이에요' : '별은 동쪽에서 떠서 서쪽으로 져요'); return; }
     setMsg('');
     const next = [...good, dir];
-    setGood(next);
+    setGood(next); sfx.correct();
     window.setTimeout(() => {
       if (idx + 1 >= ORDER.length) onDone(starsFor(ORDER.length / (ORDER.length + mistakes), mistakes === 0, cfg));
       else { setIdx(idx + 1); setHour(0); setMoved(false); }
