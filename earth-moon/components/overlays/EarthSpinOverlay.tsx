@@ -1,0 +1,115 @@
+'use client';
+
+import { useRef, useState, type PointerEvent } from 'react';
+import { useDataStore } from '@/game/dataStore';
+import { isEastward, spinAccumulate, spinDone, starsFor } from '@/game/rules';
+
+const C = { x: 400, y: 290 };
+const R = 150;
+const norm = (d: number) => ((d + 540) % 360) - 180;
+const BLOBS = [[-40, -60, 46, 34], [50, -20, 38, 50], [-30, 50, 50, 30], [70, 60, 28, 22]];
+const STARS = Array.from({ length: 26 }, (_, i) => ({ x: (i * 137) % 800, y: 40 + ((i * 71) % 230), r: i % 4 === 0 ? 3 : 1.8 }));
+
+/** 지구 자전 돌리기 (244쪽): 지구를 끌어 서→동으로 돌리면 지구 시점의 별이 동→서로 흐른다. 한 바퀴 돌리고 시점을 한 번 바꾸면 통과. */
+export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }) {
+  const cfg = useDataStore(s => s.minigame)!;
+  const [rot, setRot] = useState(0);         // 화면 회전각(도, 시계 방향 +)
+  const [total, setTotal] = useState(0);     // 서→동으로 돌린 누적각
+  const [view, setView] = useState<'space' | 'earth'>('space');
+  const [viewed, setViewed] = useState(false);
+  const [mistakes, setMistakes] = useState(0);
+  const [msg, setMsg] = useState('');
+  const [ok, setOk] = useState(false);
+  const last = useRef<number | null>(null);
+  const wrong = useRef(0); // 반대로 돌린 각을 모아 일정 이상이면 한 번 알린다
+  const svg = useRef<SVGSVGElement>(null);
+
+  const spin = (screenDelta: number) => {
+    if (ok) return;
+    setRot(r => r + screenDelta);
+    const east = -screenDelta; // 화면 시계 반대 방향 = 서→동
+    if (!isEastward(east)) {
+      wrong.current += Math.abs(screenDelta);
+      if (wrong.current > 40) { wrong.current = 0; setMistakes(m => m + 1); setMsg('지구는 서쪽에서 동쪽으로 돌아요'); }
+      return;
+    }
+    setMsg('');
+    const t = spinAccumulate(total, east);
+    setTotal(t);
+    if (spinDone(t, cfg.earthSpin.turns) && viewed) finish();
+  };
+  const finish = () => {
+    setOk(true);
+    window.setTimeout(() => onDone(starsFor(1 / (1 + mistakes), mistakes === 0, cfg)), 1100);
+  };
+  const toggle = () => {
+    setView(v => (v === 'space' ? 'earth' : 'space'));
+    if (!viewed) { setViewed(true); if (spinDone(total, cfg.earthSpin.turns)) finish(); }
+  };
+  const angleAt = (e: PointerEvent) => {
+    const r = svg.current!.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 800 - C.x;
+    const y = ((e.clientY - r.top) / r.height) * 600 - C.y;
+    return (Math.atan2(y, x) * 180) / Math.PI;
+  };
+  const down = (e: PointerEvent<SVGSVGElement>) => { (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); last.current = angleAt(e); };
+  const move = (e: PointerEvent<SVGSVGElement>) => {
+    if (last.current === null) return;
+    const a = angleAt(e);
+    spin(norm(a - last.current));
+    last.current = a;
+  };
+  const up = () => { last.current = null; };
+  const key = (e: React.KeyboardEvent) => {
+    if (e.repeat && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (e.key === 'ArrowLeft') spin(-12);
+    else if (e.key === 'ArrowRight') spin(12);
+    else if (e.key === 'Tab' || e.key === 'Enter') { e.preventDefault(); if (!e.repeat) toggle(); }
+  };
+
+  const progress = Math.min(1, total / (cfg.earthSpin.turns * 360));
+  const obs = { x: C.x + Math.cos(((rot - 90) * Math.PI) / 180) * R, y: C.y + Math.sin(((rot - 90) * Math.PI) / 180) * R };
+  const shift = (((total * 2.2) % 800) + 800) % 800; // 지구 시점: 별이 동→서(왼쪽→오른쪽)로 흐른다
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+      <div className="text-3xl font-bold">지구를 돌려 봐요</div>
+      <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+        {view === 'space' ? (
+          <>
+            {STARS.map((s, i) => <circle key={i} cx={s.x} cy={s.y + 120} r={s.r} fill="#fff" opacity="0.5" />)}
+            <circle cx="90" cy="290" r="44" fill="#ffd166" /><circle cx="90" cy="290" r="62" fill="#ffd16633" />
+            <ellipse cx={C.x} cy={C.y + R + 26} rx={R * 0.9} ry="16" fill="#000" opacity="0.4" />
+            <circle cx={C.x} cy={C.y} r={R + 14 + progress * 10} fill="none" stroke="#86efac" strokeWidth="6" strokeDasharray={`${progress * 2 * Math.PI * (R + 18)} 9999`} transform={`rotate(-90 ${C.x} ${C.y})`} />
+            <g transform={`rotate(${rot} ${C.x} ${C.y})`}>
+              <circle cx={C.x} cy={C.y} r={R} fill="#2b6cb0" />
+              {BLOBS.map(([x, y, w, h], i) => <ellipse key={i} cx={C.x + x} cy={C.y + y} rx={w} ry={h} fill="#48a15a" />)}
+              <circle cx={C.x} cy={C.y} r="7" fill="#fff" />
+            </g>
+            <circle cx={obs.x} cy={obs.y} r="12" fill="#fde68a" stroke="#92400e" strokeWidth="4" />
+            {total < 30 && (
+              <path d={`M${C.x - 80} ${C.y - 200} A 220 220 0 0 0 ${C.x - 210} ${C.y + 60}`} fill="none" stroke="#fde68a" strokeWidth="10" strokeLinecap="round" className="animate-pulse" markerEnd="url(#head)" />
+            )}
+            <defs><marker id="head" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#fde68a" /></marker></defs>
+          </>
+        ) : (
+          <>
+            <rect x="0" y="0" width="800" height="420" fill="#0a1024" />
+            {STARS.map((s, i) => <circle key={i} cx={(s.x + shift) % 800} cy={s.y} r={s.r} fill="#fff" opacity="0.85" />)}
+            <rect x="0" y="420" width="800" height="180" fill="#1f3b27" />
+            <ellipse cx="400" cy="420" rx="420" ry="26" fill="#2f5a3a" />
+            <circle cx="400" cy="500" r="16" fill="#fde68a" stroke="#92400e" strokeWidth="4" />
+            <text x="40" y="404" fontSize="26" fontWeight="700" fill="#fde68a">동</text>
+            <text x="744" y="404" fontSize="26" fontWeight="700" fill="#fde68a">서</text>
+            <path d="M300 120 H500 m-24 -16 l24 16 l-24 16" stroke="#fde68a" strokeWidth="6" fill="none" strokeLinecap="round" opacity={ok ? 0 : 0.8} />
+          </>
+        )}
+        {ok && <circle cx={C.x} cy={C.y} r={R} fill="#fde68a" className="anim-sparkle" style={{ transformOrigin: `${C.x}px ${C.y}px` }} />}
+      </svg>
+      <div className="flex items-center gap-6 h-16">
+        <button type="button" onClick={toggle} className="px-8 py-3 rounded-2xl bg-sky-300 text-black text-2xl font-bold">시점 바꾸기</button>
+        <div className="text-xl text-red-300 w-[28rem]">{msg}</div>
+      </div>
+    </div>
+  );
+}

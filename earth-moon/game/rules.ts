@@ -62,3 +62,57 @@ export function orderUnlocked(orders: Order[], id: string, completed: string[]):
 export function allOrdersDone(orders: Order[], completed: string[]): boolean {
   return orders.every(o => completed.includes(o.id));
 }
+
+/** 자전 누적: 서→동 방향 회전만 쌓는다 (244쪽). 반대로 돌리면 그대로 */
+export function spinAccumulate(total: number, deltaDeg: number): number {
+  return isEastward(deltaDeg) ? total + deltaDeg : total;
+}
+export function spinDone(total: number, turns: number): boolean {
+  return total >= turns * 360;
+}
+
+export type SkyDirection = 'north' | 'east' | 'south' | 'west';
+/** 동쪽 하늘은 비스듬히 떠오르고, 남쪽은 동→서로 지나고, 서쪽은 비스듬히 진다 (245쪽). 화면 각도(도, 오른쪽 0°·아래 +90°) */
+const SKY_MOTION: Record<Exclude<SkyDirection, 'north'>, number> = { east: -60, south: 0, west: 60 };
+
+/** 북쪽 하늘: 북극성을 중심으로 시계 반대 방향 (245쪽). 화면 좌표(아래가 +y)에서 from→to가 중심 기준 시계 반대인지 */
+export function rotatesCounterclockwise(center: { x: number; y: number }, from: { x: number; y: number }, to: { x: number; y: number }): boolean {
+  return (from.x - center.x) * (to.y - center.y) - (from.y - center.y) * (to.x - center.x) < 0;
+}
+
+/** 끌어서 그린 별의 이동 방향이 그 방향 하늘의 일주 운동과 맞는지. 북쪽은 rotatesCounterclockwise로 따로 판정한다 */
+export function starMotionOk(dir: Exclude<SkyDirection, 'north'>, dx: number, dy: number, tol: number): boolean {
+  const a = (Math.atan2(dy, dx) * 180) / Math.PI;
+  return Math.abs(((a - SKY_MOTION[dir] + 540) % 360) - 180) <= tol;
+}
+
+/** 각도(도, 0°~360°)에서 가장 가까운 자리 번호 0..n-1 (자리는 0°부터 360/n 간격) */
+export function nearestSlot(angleDeg: number, n: number): number {
+  const step = 360 / n;
+  return Math.round((((angleDeg % 360) + 360) % 360) / step) % n;
+}
+
+/** 초승달~상현~(4)~보름: 위치 2~4는 차오르는 쪽(오른쪽이 밝음), 6~8은 기우는 쪽(왼쪽이 밝음) (북반구, 248~249쪽) */
+export function isWaxing(pos: number): boolean {
+  const a = moonPositionAngle(pos);
+  return a > 0 && a < 180;
+}
+
+export type EclipseKind = { kind: 'solar' | 'lunar'; degree: 'total' | 'partial' };
+/**
+ * 그림자 모형 (252~253쪽): x가 작을수록 태양(손전등)에 가깝다. 태양-달-지구면 일식, 태양-지구-달이면 월식.
+ * 가운데 공이 태양과 먼 공을 잇는 직선에서 벗어난 거리로 전체(개기)·일부(부분)를 가른다.
+ */
+export function eclipseKind(sun: { x: number; y: number }, earth: { x: number; y: number }, moon: { x: number; y: number }, cfg: MinigameConfig): EclipseKind | null {
+  const moonMiddle = earth.x > moon.x && moon.x > sun.x;
+  const earthMiddle = moon.x > earth.x && earth.x > sun.x;
+  if (!moonMiddle && !earthMiddle) return null;
+  const mid = moonMiddle ? moon : earth;
+  const far = moonMiddle ? earth : moon;
+  const dx = far.x - sun.x, dy = far.y - sun.y;
+  const len = Math.hypot(dx, dy);
+  const off = Math.abs((mid.x - sun.x) * dy - (mid.y - sun.y) * dx) / len;
+  const { totalTol, partialTol } = cfg.shadow;
+  const degree = off <= totalTol ? 'total' : off <= partialTol ? 'partial' : null;
+  return degree ? { kind: moonMiddle ? 'solar' : 'lunar', degree } : null;
+}

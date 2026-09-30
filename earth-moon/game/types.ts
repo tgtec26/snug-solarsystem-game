@@ -16,4 +16,6 @@ export interface DialogConfig { npcName: string; intro: string[]; orders: Record
 export interface MinigameConfig {
   inputLockMs: number; stars: { two: number; three: number };
   earthSpin: { turns: number };
+  dayStars: { tolerance: number };
+  shadow: { totalTol: number; partialTol: number };
 }

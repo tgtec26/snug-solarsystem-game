@@ -83,6 +83,9 @@ export function validateMinigame(c: MinigameConfig): string[] {
     errs.push('minigame: stars는 0 < two < three ≤ 1');
   }
   if (!c.earthSpin || !isNum(c.earthSpin.turns) || c.earthSpin.turns < 1 || c.earthSpin.turns > 3) errs.push('minigame: earthSpin.turns는 1~3');
+  if (!c.dayStars || !isNum(c.dayStars.tolerance) || c.dayStars.tolerance < 15 || c.dayStars.tolerance > 60) errs.push('minigame: dayStars.tolerance는 15~60');
+  const sh = c.shadow;
+  if (!sh || !isNum(sh.totalTol) || !isNum(sh.partialTol) || sh.totalTol <= 0 || !(sh.totalTol < sh.partialTol) || sh.partialTol > 90) errs.push('minigame: shadow는 0 < totalTol < partialTol ≤ 90');
   return errs;
 }
 

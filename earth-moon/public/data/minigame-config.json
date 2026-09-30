@@ -6,5 +6,12 @@
   },
   "earthSpin": {
     "turns": 1
+  },
+  "dayStars": {
+    "tolerance": 40
+  },
+  "shadow": {
+    "totalTol": 14,
+    "partialTol": 48
   }
 }

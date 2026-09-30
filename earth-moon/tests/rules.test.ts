@@ -89,3 +89,62 @@ describe('의뢰 흐름', () => {
     expect(new Set(cards).size).toBe(28);
   });
 });
+
+import { spinAccumulate, spinDone, rotatesCounterclockwise, starMotionOk, nearestSlot, isWaxing, eclipseKind } from '@/game/rules';
+
+describe('지구 자전 돌리기 (244쪽)', () => {
+  it('서→동 회전만 쌓이고 한 바퀴면 완료', () => {
+    let t = spinAccumulate(0, 90);
+    t = spinAccumulate(t, -50);
+    expect(t).toBe(90);
+    t = spinAccumulate(t, 270);
+    expect(spinDone(t, 1)).toBe(true);
+    expect(spinDone(359, 1)).toBe(false);
+  });
+});
+
+describe('하루 동안 별의 운동 (245쪽)', () => {
+  const c = { x: 0, y: 0 };
+  it('북쪽 하늘: 북극성 중심 시계 반대 방향', () => {
+    expect(rotatesCounterclockwise(c, { x: 1, y: 0 }, { x: 0, y: -1 })).toBe(true);
+    expect(rotatesCounterclockwise(c, { x: 1, y: 0 }, { x: 0, y: 1 })).toBe(false);
+  });
+  it('동쪽은 오른쪽 위, 남쪽은 오른쪽, 서쪽은 오른쪽 아래로 이동', () => {
+    expect(starMotionOk('east', 10, -17, 40)).toBe(true);
+    expect(starMotionOk('east', 10, 17, 40)).toBe(false);
+    expect(starMotionOk('south', 20, 0, 40)).toBe(true);
+    expect(starMotionOk('south', -20, 0, 40)).toBe(false);
+    expect(starMotionOk('west', 10, 17, 40)).toBe(true);
+    expect(starMotionOk('west', 10, -17, 40)).toBe(false);
+  });
+});
+
+describe('자리 찾기와 달 모양', () => {
+  it('가장 가까운 자리', () => {
+    expect(nearestSlot(10, 4)).toBe(0);
+    expect(nearestSlot(80, 4)).toBe(1);
+    expect(nearestSlot(350, 8)).toBe(0);
+    expect(nearestSlot(-20, 8)).toBe(0);
+  });
+  it('차오르는 위치는 2~4, 기우는 위치는 6~8', () => {
+    [2, 3, 4].forEach(p => expect(isWaxing(p)).toBe(true));
+    [1, 5, 6, 7, 8].forEach(p => expect(isWaxing(p)).toBe(false));
+  });
+});
+
+describe('그림자 모형 (252~253쪽)', () => {
+  const cfg = { shadow: { totalTol: 14, partialTol: 48 } } as MinigameConfig;
+  const sun = { x: 0, y: 0 };
+  it('태양-달-지구 일직선이면 개기일식, 조금 벗어나면 부분일식', () => {
+    expect(eclipseKind(sun, { x: 400, y: 0 }, { x: 200, y: 5 }, cfg)).toEqual({ kind: 'solar', degree: 'total' });
+    expect(eclipseKind(sun, { x: 400, y: 0 }, { x: 200, y: 30 }, cfg)).toEqual({ kind: 'solar', degree: 'partial' });
+    expect(eclipseKind(sun, { x: 400, y: 0 }, { x: 200, y: 90 }, cfg)).toBeNull();
+  });
+  it('태양-지구-달 일직선이면 개기월식, 조금 벗어나면 부분월식', () => {
+    expect(eclipseKind(sun, { x: 200, y: 0 }, { x: 400, y: 0 }, cfg)).toEqual({ kind: 'lunar', degree: 'total' });
+    expect(eclipseKind(sun, { x: 200, y: 0 }, { x: 400, y: 50 }, cfg)?.degree).toBe('partial');
+  });
+  it('태양이 가운데이거나 같은 쪽에 있으면 식이 없다', () => {
+    expect(eclipseKind({ x: 200, y: 0 }, { x: 400, y: 0 }, { x: 0, y: 0 }, cfg)).toBeNull();
+  });
+});
