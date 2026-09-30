@@ -1,0 +1,44 @@
+{
+  "bodies": [
+    { "id": "sun", "name": "태양" },
+    { "id": "planet", "name": "행성" },
+    { "id": "dwarf", "name": "왜소 행성" },
+    { "id": "asteroid", "name": "소행성" },
+    { "id": "comet", "name": "혜성" },
+    { "id": "moon", "name": "위성" }
+  ],
+  "traits": [
+    { "id": "sun-light", "body": "sun", "text": "스스로 빛을 낸다", "page": 229 },
+    { "id": "sun-center", "body": "sun", "text": "태양계의 중심", "page": 229 },
+    { "id": "sun-gas", "body": "sun", "text": "수소와 헬륨", "page": 229 },
+    { "id": "planet-eight", "body": "planet", "text": "크고 중력이 큰 8개", "page": 241 },
+    { "id": "dwarf-round", "body": "dwarf", "text": "둥글고 행성보다 작다", "page": 241 },
+    { "id": "dwarf-example", "body": "dwarf", "text": "명왕성, 세레스", "page": 229 },
+    { "id": "asteroid-orbit", "body": "asteroid", "text": "화성·목성 궤도 사이", "page": 241 },
+    { "id": "asteroid-shape", "body": "asteroid", "text": "모양이 불규칙하다", "page": 241 },
+    { "id": "comet-ice", "body": "comet", "text": "얼음과 먼지", "page": 241 },
+    { "id": "comet-tail", "body": "comet", "text": "태양 반대쪽 꼬리", "page": 230 },
+    { "id": "moon-orbit", "body": "moon", "text": "행성 주위를 공전", "page": 241 }
+  ],
+  "criteria": [
+    { "id": "mass", "name": "질량", "values": { "small": "작다", "large": "크다" } },
+    { "id": "radius", "name": "반지름", "values": { "small": "작다", "large": "크다" } },
+    { "id": "surface", "name": "표면", "values": { "rock": "단단한 암석", "gas": "기체" } },
+    { "id": "ring", "name": "고리", "values": { "none": "없다", "yes": "있다" } },
+    { "id": "moons", "name": "위성 수", "values": { "few": "없거나 적다", "many": "많다" } }
+  ],
+  "groups": [
+    { "id": "terrestrial", "name": "지구형 행성", "values": { "mass": "small", "radius": "small", "surface": "rock", "ring": "none", "moons": "few" } },
+    { "id": "jovian", "name": "목성형 행성", "values": { "mass": "large", "radius": "large", "surface": "gas", "ring": "yes", "moons": "many" } }
+  ],
+  "planets": [
+    { "id": "mercury", "name": "수성", "group": "terrestrial" },
+    { "id": "venus", "name": "금성", "group": "terrestrial" },
+    { "id": "earth", "name": "지구", "group": "terrestrial" },
+    { "id": "mars", "name": "화성", "group": "terrestrial" },
+    { "id": "jupiter", "name": "목성", "group": "jovian" },
+    { "id": "saturn", "name": "토성", "group": "jovian" },
+    { "id": "uranus", "name": "천왕성", "group": "jovian" },
+    { "id": "neptune", "name": "해왕성", "group": "jovian" }
+  ]
+}

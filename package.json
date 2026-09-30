@@ -1,0 +1,10 @@
+{
+  "name": "snug-solarsystem-game",
+  "private": true,
+  "scripts": {
+    "dev:dex": "pnpm --filter solar-dex dev",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "packageManager": "pnpm@10.33.2"
+}

@@ -1,0 +1,12 @@
+[
+  { "id": "o0", "title": "오늘 밤의 손님", "room": "library", "minigame": "telescope", "pages": [232, 233], "requires": [], "cards": [] },
+  { "id": "o1", "title": "태양계 식구 맞히기", "room": "library", "minigame": "bodies", "pages": [228, 229], "requires": ["o0"],
+    "cards": ["body-sun", "body-planet", "body-dwarf", "body-asteroid", "body-comet", "body-moon"] },
+  { "id": "o2", "title": "행성 두 무리", "room": "planetHall", "minigame": "planets", "pages": [234, 235], "requires": ["o1"],
+    "cards": ["planet-mercury", "planet-venus", "planet-earth", "planet-mars", "planet-jupiter", "planet-saturn", "planet-uranus", "planet-neptune"] },
+  { "id": "o3", "title": "꼬리는 어느 쪽", "room": "library", "minigame": "comet", "pages": [230, 231], "requires": ["o2"], "cards": [] },
+  { "id": "o4", "title": "태양에 검은 점이 있다", "room": "sunDeck", "minigame": "projection", "pages": [236, 237], "requires": ["o3"],
+    "cards": ["sun-photosphere", "sun-granule", "sun-sunspot", "sun-chromosphere", "sun-corona"] },
+  { "id": "o5", "title": "활동이 활발한 해", "room": "sunDeck", "minigame": "forecast", "pages": [238, 239], "requires": ["o4"],
+    "cards": ["sun-prominence", "sun-flare"] }
+]

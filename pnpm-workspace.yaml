@@ -1,0 +1,6 @@
+packages:
+  - shared
+  - solar-dex
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
