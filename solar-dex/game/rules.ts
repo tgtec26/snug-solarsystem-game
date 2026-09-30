@@ -93,3 +93,23 @@ export function tailPointsAway(sun: { x: number; y: number }, comet: { x: number
 export function effectZoneOk(sun: SunData, effectId: string, zone: string): boolean {
   return sun.effects.find(e => e.id === effectId)?.zone === zone;
 }
+
+/** 두 점 사이 거리 (조준·찾기 판정 공통) */
+export function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+/** 초점 선명도 0~1: 맞는 위치에서 멀어질수록 흐려진다. value·best는 0~1 (232쪽 접안렌즈 초점) */
+export function focusSharp(value: number, best: number, tol: number): number {
+  return clamp(1 - Math.abs(value - best) / tol, 0, 1);
+}
+
+/** 사진 채점: 십자선 중앙에 가까울수록, 선명할수록 높다 (0~1) */
+export function photoAccuracy(aimDist: number, aimRadius: number, sharp: number): number {
+  return (clamp(1 - aimDist / aimRadius, 0, 1) + clamp(sharp, 0, 1)) / 2;
+}
+
+/** 망원경을 태양 쪽으로 돌리면 막는다: 태양이 시야 중심에서 guard 안에 들어온 경우 (232, 236쪽) */
+export function telescopeSunCheck(sunScreen: { x: number; y: number }, center: { x: number; y: number }, guard: number): { ok: boolean; reason: string } {
+  return safetyCheck(distance(sunScreen, center) < guard ? 'aim-sun-without-filter' : 'safe');
+}

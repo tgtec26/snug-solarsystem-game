@@ -15,5 +15,14 @@
       2,
       3
     ]
+  },
+  "telescope": {
+    "aimRadius": 40,
+    "focusTolerance": 0.3,
+    "sunGuard": 90
+  },
+  "projection": {
+    "aimRadius": 30,
+    "focusTolerance": 0.25
   }
 }

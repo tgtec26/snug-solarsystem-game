@@ -129,3 +129,23 @@ describe('활동 예보 자리 (239쪽)', () => {
     S.effects.forEach(e => S.effects.forEach(z => expect(effectZoneOk(S, e.id, z.zone)).toBe(e.id === z.id)));
   });
 });
+
+import { distance, focusSharp, photoAccuracy, telescopeSunCheck } from '@/game/rules';
+
+describe('망원경 조준·초점 (232쪽)', () => {
+  it('거리와 초점 선명도', () => {
+    expect(distance({ x: 0, y: 0 }, { x: 3, y: 4 })).toBe(5);
+    expect(focusSharp(0.6, 0.6, 0.3)).toBe(1);
+    expect(focusSharp(0.9, 0.6, 0.3)).toBeCloseTo(0);
+    expect(focusSharp(0.75, 0.6, 0.3)).toBeCloseTo(0.5);
+  });
+  it('사진 점수는 중앙·선명할수록 높고 0~1', () => {
+    expect(photoAccuracy(0, 40, 1)).toBe(1);
+    expect(photoAccuracy(40, 40, 0)).toBe(0);
+    expect(photoAccuracy(10, 40, 1)).toBeGreaterThan(photoAccuracy(30, 40, 1));
+  });
+  it('태양이 시야 중심 가까이 오면 막는다 (236쪽)', () => {
+    expect(telescopeSunCheck({ x: 50, y: 0 }, { x: 0, y: 0 }, 90).ok).toBe(false);
+    expect(telescopeSunCheck({ x: 300, y: 0 }, { x: 0, y: 0 }, 90).ok).toBe(true);
+  });
+});

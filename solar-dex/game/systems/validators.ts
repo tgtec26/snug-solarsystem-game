@@ -87,6 +87,13 @@ export function validateMinigame(c: MinigameConfig): string[] {
   if (!c.bodies || !isNum(c.bodies.cards) || c.bodies.cards < 6 || c.bodies.cards > 11) errs.push('minigame: bodies.cards는 6~11');
   if (!c.comet || !isNum(c.comet.tolerance) || c.comet.tolerance <= 0 || c.comet.tolerance > 60) errs.push('minigame: comet.tolerance는 0~60');
   if (!c.comet || !Array.isArray(c.comet.ranks) || c.comet.ranks.length < 2 || !c.comet.ranks.every(isNum)) errs.push('minigame: comet.ranks 2개 이상');
+  const t = c.telescope;
+  if (!t || !isNum(t.aimRadius) || t.aimRadius < 15 || t.aimRadius > 80) errs.push('minigame: telescope.aimRadius는 15~80');
+  if (!t || !isNum(t.focusTolerance) || t.focusTolerance <= 0.1 || t.focusTolerance > 0.6) errs.push('minigame: telescope.focusTolerance는 0.1 초과~0.6');
+  if (!t || !isNum(t.sunGuard) || t.sunGuard < 40 || t.sunGuard > 200) errs.push('minigame: telescope.sunGuard는 40~200');
+  const p = c.projection;
+  if (!p || !isNum(p.aimRadius) || p.aimRadius < 15 || p.aimRadius > 80) errs.push('minigame: projection.aimRadius는 15~80');
+  if (!p || !isNum(p.focusTolerance) || p.focusTolerance <= 0.1 || p.focusTolerance > 0.6) errs.push('minigame: projection.focusTolerance는 0.1 초과~0.6');
   return errs;
 }
 
