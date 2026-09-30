@@ -15,3 +15,5 @@ html, body {
 .anim-pop { animation: pop 0.45s ease-out; }
 .anim-shake { animation: shake 0.3s linear; }
 .anim-sparkle { animation: sparkle 0.7s ease-out forwards; }
+
+@keyframes snug-fall { 0% { opacity: 1; translate: 0 0; } 100% { opacity: 0.9; translate: 40px 860px; rotate: 540deg; } }

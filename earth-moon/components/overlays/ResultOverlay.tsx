@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { sfx } from '@snug/shared/src/audio';
 import { saveCard } from '@snug/shared/src/saveCard';
+import { Confetti } from '@snug/shared/src/Confetti';
 import { useGameStore } from '@/game/store';
 import { inputLock } from '@/components/UIOverlay';
 
@@ -20,13 +21,20 @@ export function ResultOverlay({ summary = false }: { summary?: boolean }) {
   const [saveMsg, setSaveMsg] = useState('');
   useEffect(() => { if (summary) sfx.ending(); else sfx.success(); }, [summary]);
   const total = Object.values(stars).reduce((a, b) => a + b, 0);
+  const [shown, setShown] = useState(0); // 별 개수 카운트업
+  useEffect(() => {
+    if (!summary) return;
+    const id = window.setInterval(() => setShown(n => (n < total ? n + 1 : n)), 180);
+    return () => window.clearInterval(id);
+  }, [summary, total]);
   return (
     <div className="absolute inset-0 flex items-center justify-center">
+      {(summary || (stars[current ?? ''] ?? 0) === 3) && <Confetti count={summary ? 90 : 40} />}
       <div ref={card} className="w-[760px] rounded-3xl bg-black/60 border-2 border-white/30 p-10 flex flex-col items-center gap-5">
         <div className="text-4xl font-bold">{summary ? '오늘의 관측 결과 · 지구와 달 모형' : '의뢰 완료'}</div>
         {summary ? (
           <>
-            <div className="text-2xl">의뢰 {completed.length}/{orders.length} · 별 {total}개</div>
+            <div className="text-2xl">의뢰 {completed.length}/{orders.length} · 별 {summary ? shown : total}개</div>
             <div className="text-2xl">새로 모은 일지 카드 {newCards.length}장</div>
             <div className="flex gap-4 mt-4" data-no-capture="1">
               <button type="button" className="px-8 py-4 rounded-2xl bg-sky-300 text-black text-2xl font-bold" onClick={async () => { if (card.current) setSaveMsg((await saveCard(card.current, 'earth-moon-result.png')) ? '' : '저장하지 못했어요'); }}>나의 결과 내려받기</button>
