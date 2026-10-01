@@ -1,5 +1,6 @@
 'use client';
 
+import { DragGhost } from '@snug/shared/src/DragGhost';
 import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
@@ -132,9 +133,9 @@ export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void 
         {stage === 'focus' && <input type="range" min={0} max={1} step={0.01} value={focus} onChange={e => onFocus(Number(e.target.value))} className="w-96 h-10 accent-yellow-300" aria-label="초점 다이얼" />}
         <div className="text-xl text-red-300 w-[28rem]">{msg}</div>
       </div>
-      {card && <div className="fixed pointer-events-none px-7 py-3 rounded-full bg-slate-800 border-4 border-yellow-300 shadow-2xl" style={{ left: card.x - 40, top: card.y - 40, zIndex: 100 }}>{/* eslint-disable-next-line @next/next/no-img-element */}
+      {card && <DragGhost x={card.x} y={card.y}><div className="px-7 py-3 rounded-full bg-slate-800 border-4 border-yellow-300 shadow-2xl">{/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/assets/blocker-plate.webp" alt="" width={56} height={56} draggable={false} />
-      </div>}
+      </div></DragGhost>}
     </div>
   );
 }

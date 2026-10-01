@@ -1,5 +1,6 @@
 'use client';
 
+import { DragGhost } from '@snug/shared/src/DragGhost';
 import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
@@ -131,7 +132,7 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
         ))}
         <div className="text-xl text-red-300 w-full text-center h-7">{msg}</div>
       </div>
-      {drag && <div className="fixed pointer-events-none px-3 py-1.5 rounded-lg text-lg font-bold bg-yellow-300 text-black shadow-2xl" style={{ left: drag.x - 40, top: drag.y - 20, zIndex: 100 }}>{nameOf(drag.id)}</div>}
+      {drag && <DragGhost x={drag.x} y={drag.y}><div className="px-3 py-1.5 rounded-lg text-lg font-bold bg-yellow-300 text-black shadow-2xl">{nameOf(drag.id)}</div></DragGhost>}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { DragGhost } from '@snug/shared/src/DragGhost';
 import { sfx } from '@snug/shared/src/audio';
 import { useState } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
@@ -58,7 +59,7 @@ export function ForecastOverlay({ onDone }: { onDone: (stars: number) => void })
         ))}
       </div>
       <div className="h-8 text-xl text-red-300">{msg}</div>
-      {drag && <div className="fixed pointer-events-none px-5 py-3 rounded-xl text-xl font-bold bg-yellow-300 text-black shadow-2xl" style={{ left: drag.x - 40, top: drag.y - 25, zIndex: 100 }}>{eff(drag.id).name}</div>}
+      {drag && <DragGhost x={drag.x} y={drag.y}><div className="px-5 py-3 rounded-xl text-xl font-bold bg-yellow-300 text-black shadow-2xl">{eff(drag.id).name}</div></DragGhost>}
     </div>
   );
 }

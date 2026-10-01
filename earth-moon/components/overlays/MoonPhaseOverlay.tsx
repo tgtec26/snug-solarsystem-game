@@ -1,5 +1,6 @@
 'use client';
 
+import { DragGhost } from '@snug/shared/src/DragGhost';
 import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
@@ -96,7 +97,7 @@ export function MoonPhaseOverlay({ onDone }: { onDone: (stars: number) => void }
         ))}
         <div className="text-xl text-red-300 w-72">{msg}</div>
       </div>
-      {drag && <div className="fixed pointer-events-none px-5 py-2 rounded-xl text-xl font-bold bg-yellow-300 text-black shadow-2xl" style={{ left: drag.x - 40, top: drag.y - 22, zIndex: 100 }}>{drag.id}</div>}
+      {drag && <DragGhost x={drag.x} y={drag.y}><div className="px-5 py-2 rounded-xl text-xl font-bold bg-yellow-300 text-black shadow-2xl">{drag.id}</div></DragGhost>}
     </div>
   );
 }

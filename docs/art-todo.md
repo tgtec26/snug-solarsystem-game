@@ -45,3 +45,7 @@
 ## 관측 의뢰서 카드 (2026-10-01)
 - codex 생성: 양피지 카드(`orders/card-paper`), 완료 도장(`stamp-done`), 자물쇠(`lock`), 의뢰별 활동 그림 11장(`orders/<minigame id>.webp`: telescope·bodies·planets·comet·projection·forecast / earthSpin·dayStars·constellation·moonPhase·shadow). 카드는 그림으로 활동을 알려 주고, 잠김=흐림+자물쇠, 완료=도장+별, 다음 의뢰=반짝임.
 - 새 미니게임을 추가하면 `orders/<minigame id>.webp`를 같이 넣는다.
+
+## 식구 카드 화면 개편 (2026-10-01)
+- 천체 칸 2행 3열(아이콘 왼쪽 위), 카드 더미(`cards/card-back`)에서 특징 카드(`cards/card-front`)가 한 장씩 나온다. 천체에 붙은 카드는 같은 양피지·금색 테두리.
+- 끌기 그림자는 `shared/src/DragGhost.tsx`(포털 + `--stage-scale`)로 커서 한가운데에 놓는다. 무대가 확대·축소돼 있어 `position: fixed`를 무대 안에 두면 어긋나는 버그였다. 행성 나눔판·활동 예보·투영판·12궁 링·달 위상판도 같은 그림자로 교체.

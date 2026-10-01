@@ -11,6 +11,7 @@ export function StageFrame({ children }: { children: ReactNode }) {
     const update = () => {
       const s = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
       setSize({ w: GAME_WIDTH * s, h: GAME_HEIGHT * s, scale: s });
+      document.documentElement.style.setProperty('--stage-scale', String(s)); // 끌기 그림자(DragGhost)가 쓴다
     };
     update();
     window.addEventListener('resize', update);
