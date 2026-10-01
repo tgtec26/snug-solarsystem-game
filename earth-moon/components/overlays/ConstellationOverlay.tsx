@@ -11,7 +11,7 @@ import { chairBoards, midnightConstellation, nearestSlot, starsFor, sunConstella
 const C = { x: 400, y: 290 };
 const rad = (d: number) => (d * Math.PI) / 180;
 const pt = (deg: number, r: number) => ({ x: C.x + Math.cos(rad(deg)) * r, y: C.y - Math.sin(rad(deg)) * r }); // 위쪽 +, 시계 반대 증가
-const CARD_W = 92;
+const CARD_W = 76;
 const boardAngle = (i: number) => 90 + 90 * i;
 const monthAngle = (m: number) => 90 + 30 * (m - 1);
 const shuffle = <T,>(a: T[]) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -25,6 +25,8 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
   const [round, setRound] = useState(0);
   const [seat, setSeat] = useState(0);
   const [month, setMonth] = useState(8);
+  const [turned, setTurned] = useState(false); // 지구를 한 번이라도 돌렸는가
+  const earthDrag = useRef(false);
   const [placed, setPlaced] = useState<Record<number, string>>({});
   const [mistakes, setMistakes] = useState(0);
   const [msg, setMsg] = useState('');
@@ -50,9 +52,32 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
     const r = svg.current!.getBoundingClientRect();
     return (Math.atan2(-(((e.clientY - r.top) / r.height) * 600 - C.y), ((e.clientX - r.left) / r.width) * 800 - C.x) * 180) / Math.PI - 90;
   };
-  const down = (e: PointerEvent<SVGSVGElement>) => { if (phase !== 'chair') return; (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); dragging.current = true; pick(nearestSlot(angleAt(e), 4)); };
-  const move = (e: PointerEvent<SVGSVGElement>) => { if (dragging.current) pick(nearestSlot(angleAt(e), 4)); };
-  const up = () => { if (!dragging.current) return; dragging.current = false; confirmSeat(seatRef.current); };
+  const svgPt = (e: PointerEvent) => {
+    const r = svg.current!.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * 800, y: ((e.clientY - r.top) / r.height) * 600 };
+  };
+  /** 지구를 잡고 돌리면 가장 가까운 달 자리로 붙는다 */
+  const monthAt = (e: PointerEvent) => {
+    const q = svgPt(e);
+    const a = (Math.atan2(-(q.y - C.y), q.x - C.x) * 180) / Math.PI; // 지구 각도 = monthAngle(month) + 180
+    return ((Math.round((a - 270) / 30) % 12) + 12) % 12 + 1;
+  };
+  const down = (e: PointerEvent<SVGSVGElement>) => {
+    if (phase === 'ring') {
+      const q = svgPt(e), ep = pt(monthAngle(month) + 180, 150);
+      if (Math.hypot(q.x - ep.x, q.y - ep.y) > 70) return;
+      (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); earthDrag.current = true; return;
+    }
+    (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); dragging.current = true; pick(nearestSlot(angleAt(e), 4));
+  };
+  const move = (e: PointerEvent<SVGSVGElement>) => {
+    if (earthDrag.current) { const m = monthAt(e); if (m !== month) { setMonth(m); setTurned(true); } return; }
+    if (dragging.current) pick(nearestSlot(angleAt(e), 4));
+  };
+  const up = () => {
+    earthDrag.current = false;
+    if (!dragging.current) return; dragging.current = false; confirmSeat(seatRef.current);
+  };
   const key = (e: React.KeyboardEvent) => {
     if (e.repeat || phase !== 'chair') return;
     if (e.key === 'ArrowLeft') pick((seatRef.current + 1) % 4);
@@ -70,15 +95,23 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
   }, phase === 'ring', { w: CARD_W, h: CARD_W * 1.5 });
   const nameOf = (id: string) => sky.zodiac.find(z => z.id === id)!.name;
   const [order] = useState(() => shuffle(sky.zodiac.map(z => z.id))); // 카드가 달 순서대로 나오면 답이 보인다
-  const free = order.map(id => sky.zodiac.find(z => z.id === id)!).filter(z => !Object.values(placed).includes(z.id));
-  const sunName = nameOf(sunConstellation(sky, month)!), nightName = nameOf(midnightConstellation(sky, month)!);
+  const hi = [sunConstellation(sky, month), midnightConstellation(sky, month)]; // 지금 달에서 태양 쪽·한밤중에 해당하는 별자리
+  const hiMonths = [month, ((month + 5) % 12) + 1];
+  const cardCol = (ids: string[]) => (
+    <div className="flex flex-col gap-1">{ids.map(id => Object.values(placed).includes(id) ? <div key={id} style={{ width: CARD_W, height: CARD_W * 1.5 }} /> : (
+      <button key={id} type="button" {...bindCard(id)} aria-label={nameOf(id)} className={`touch-none cursor-grab rounded-lg ${selected === id ? 'ring-4 ring-yellow-300' : ''}`} style={hi.includes(id) ? { boxShadow: '0 0 0 4px #fbbf24, 0 0 18px 6px #fbbf2488' } : undefined}>
+        <ZodiacCard id={id} name={nameOf(id)} w={CARD_W} faded={drag?.id === id} />
+      </button>
+    ))}</div>
+  );
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-      <svg ref={svg} viewBox="0 0 800 600" width={phase === 'ring' ? 640 : 800} height={phase === 'ring' ? 480 : 600} className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+    <div className={`absolute inset-0 flex items-center justify-center ${phase === 'ring' ? 'gap-5' : 'flex-col gap-3'}`}>
+      {phase === 'ring' && cardCol(order.slice(0, 6))}
+      <svg ref={svg} viewBox="0 0 800 600" width={phase === 'ring' ? 960 : 800} height={phase === 'ring' ? 720 : 600} className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <ellipse cx={C.x} cy="570" rx="250" ry="18" fill="#000" opacity="0.4" />
         {/* 전등(태양) */}
-        <image href="/assets/sun.webp" x={C.x - 50} y={C.y - 50} width="100" height="100" />
+        <image href="/assets/sun.webp" x={C.x - 65} y={C.y - 65} width="130" height="130" />
         {phase === 'chair' ? (
           <>
             <circle cx={C.x} cy={C.y} r="130" fill="none" stroke="#ffffff33" strokeDasharray="6 8" strokeWidth="3" />
@@ -109,7 +142,7 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
               const p = pt(monthAngle(z.month), 235); const done = placed[z.month];
               return (
                 <g key={z.month} data-drop={`slot-${z.month}`} onClick={() => placeSelected(`slot-${z.month}`)} className="cursor-pointer">
-                  <circle cx={p.x} cy={p.y} r="34" fill={done ? '#16653466' : '#ffffff14'} stroke={done ? '#86efac' : selected || over === `slot-${z.month}` ? '#fde68a' : '#ffffff55'} strokeWidth="3" strokeDasharray={done ? undefined : '8 6'} />
+                  <circle cx={p.x} cy={p.y} r="34" fill={done ? '#16653466' : '#ffffff14'} stroke={done ? '#86efac' : selected || over === `slot-${z.month}` || hiMonths.includes(z.month) ? '#fbbf24' : '#ffffff55'} strokeWidth={!done && hiMonths.includes(z.month) ? 5 : 3} strokeDasharray={done ? undefined : '8 6'} />
                   {done && <image href={`/assets/zodiac/${done}.webp`} x={p.x - 22} y={p.y - 30} width="44" height="44" />}
                   {done && <text x={p.x} y={p.y + 26} textAnchor="middle" fontSize="14" fontWeight="700" fill="#bbf7d0">{nameOf(done).replace('자리', '')}</text>}
                   {done && <text x={p.x} y={p.y + 50} textAnchor="middle" fontSize="15" fill="#ffffffaa">{z.month}월</text>}
@@ -119,21 +152,18 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
             {(() => { const e = pt(monthAngle(month) + 180, 150); return (
               <g>
                 <line x1={C.x} y1={C.y} x2={pt(monthAngle(month), 200).x} y2={pt(monthAngle(month), 200).y} stroke="#ffd16688" strokeWidth="3" strokeDasharray="4 6" />
-                <image href="/assets/earth-ball.webp" x={e.x - 24} y={e.y - 24} width="48" height="48" />
+                <circle cx={e.x} cy={e.y} r="46" fill="none" stroke="#fde68a" strokeWidth="3" strokeDasharray="6 6" className={turned ? '' : 'animate-pulse'} />
+                <image href="/assets/earth-ball.webp" x={e.x - 36} y={e.y - 36} width="72" height="72" className="cursor-grab" />
+                <text x={e.x} y={e.y + 68} textAnchor="middle" fontSize="22" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="4" paintOrder="stroke">{month}월</text>
               </g>); })()}
           </>
         )}
+        {phase === 'ring' && <text x="400" y="588" textAnchor="middle" fontSize="20" fontWeight="700" fill={msg ? '#fca5a5' : '#fef9c3'} stroke="#05070f" strokeWidth="4" paintOrder="stroke">{msg || (turned ? '금색 테두리 카드를 금색 칸에 붙여요' : '지구를 잡고 돌려 봐요')}</text>}
       </svg>
-      <div className="flex items-center gap-4 min-h-20 flex-wrap justify-center w-[1180px]">
-        {phase === 'ring' && <div className="w-full text-center text-xl text-yellow-200">{month}월 · 태양 쪽 {sunName} · 한밤중 남쪽 {nightName}</div>}
-        {phase === 'ring' && <input type="range" min={1} max={12} step={1} value={month} onChange={e => setMonth(Number(e.target.value))} className="w-56 h-10 accent-yellow-300" aria-label="달" />}
-        {phase === 'ring' && <div className="flex gap-1 justify-center w-full h-[138px]">{free.map(z => (
-          <button key={z.id} type="button" {...bindCard(z.id)} aria-label={z.name} className={`touch-none cursor-grab rounded-lg ${selected === z.id ? 'ring-4 ring-yellow-300' : ''}`}>
-            <ZodiacCard id={z.id} name={z.name} w={CARD_W} faded={drag?.id === z.id} />
-          </button>
-        ))}</div>}
+      {phase === 'ring' && cardCol(order.slice(6))}
+      {phase === 'chair' && <div className="flex items-center gap-4 min-h-20 flex-wrap justify-center w-[1180px]">
         <div className="text-xl text-red-300 w-full text-center h-7">{msg}</div>
-      </div>
+      </div>}
       {drag && <DragGhost x={drag.x} y={drag.y}><ZodiacCard id={drag.id} name={nameOf(drag.id)} w={CARD_W} /></DragGhost>}
     </div>
   );
