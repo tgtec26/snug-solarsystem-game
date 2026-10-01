@@ -135,6 +135,15 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
           );
         })}
         {Array.from({ length: n }).map((_, i) => { const p = pos(i); return <StarShape key={i} x={p.x} y={p.y} r={i === 0 ? 8 : 6} ring={moved && !done} />; })}
+        {moved && !done && !line && (() => {
+          const p = pos(3); // 가운데쯤 있는 별 하나를 가리킨다
+          return (
+            <g className="animate-pulse" pointerEvents="none">
+              <circle cx={p.x} cy={p.y} r="34" fill="none" stroke="#86efac" strokeWidth="4" />
+              <path d={`M${p.x} ${p.y - 40} l-14 -22 h9 v-18 h10 v18 h9 z`} fill="#86efac" stroke="#05070f" strokeWidth="2" />
+            </g>
+          );
+        })()}
         {line && <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke="#fde68a" strokeWidth="6" strokeLinecap="round" />}
         {/* 방향 표지: 지금 보는 방향의 왼쪽·오른쪽이 어느 쪽인지 */}
         <g fontSize="26" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="5" paintOrder="stroke">
