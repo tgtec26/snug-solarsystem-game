@@ -7,6 +7,8 @@ import { useDragDrop } from '@snug/shared/src/useDragDrop';
 import { useDataStore } from '@/game/dataStore';
 import { matchTrait, pickTraitCards, starsFor } from '@/game/rules';
 
+const HAND_SIZE = { w: 150, h: 210 };
+
 /** 손에 든 특징 카드: 가로가 일정한 실제 카드 모양. 천체 칸에 붙은 카드(작은 쪽)와 같은 색·테두리를 쓴다. */
 function HandCard({ children, faded }: { children: ReactNode; faded?: boolean }) {
   return (
@@ -43,7 +45,7 @@ export function BodiesOverlay({ onDone }: { onDone: (stars: number) => void }) {
   const text = (id: string) => bodies.traits.find(t => t.id === id)!.text;
   const current = cards[0];
 
-  const { drag, selected, bindCard, placeSelected } = useDragDrop((cardId, bodyId) => {
+  const { drag, over, selected, bindCard, placeSelected } = useDragDrop((cardId, bodyId) => {
     if (matchTrait(bodies, cardId, bodyId)) {
       setPlaced(p => ({ ...p, [bodyId]: [...(p[bodyId] ?? []), cardId] }));
       const left = cards.filter(c => c !== cardId);
@@ -58,7 +60,7 @@ export function BodiesOverlay({ onDone }: { onDone: (stars: number) => void }) {
       const owner = bodies.bodies.find(b => b.id === bodies.traits.find(t => t.id === cardId)!.body)!;
       setMsg(`그건 ${owner.name}의 특징이에요`);
     }
-  });
+  }, true, HAND_SIZE);
 
   return (
     <div className="absolute inset-0">
@@ -72,7 +74,7 @@ export function BodiesOverlay({ onDone }: { onDone: (stars: number) => void }) {
             type="button"
             data-drop={b.id}
             onClick={() => placeSelected(b.id)}
-            className={`relative h-[240px] rounded-3xl border-2 text-left ${selected ? 'border-yellow-300 bg-yellow-200/10' : 'border-white/30 bg-black/45'} ${flash?.id === b.id ? (flash.ok ? 'anim-pop' : 'anim-shake') : ''}`}
+            className={`relative h-[240px] rounded-3xl border-2 text-left ${selected || over === b.id ? 'border-yellow-300 bg-yellow-200/15' : 'border-white/30 bg-black/45'} ${flash?.id === b.id ? (flash.ok ? 'anim-pop' : 'anim-shake') : ''}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`/assets/icons/body-${b.id}.webp`} alt="" width={112} height={112} draggable={false} className="absolute left-3 top-3 pointer-events-none" />

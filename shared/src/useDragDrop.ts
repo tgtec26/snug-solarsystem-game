@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent } from 'react';
 
 export interface DragState { id: string; x: number; y: number }
 
@@ -8,36 +8,81 @@ export interface DragState { id: string; x: number; y: number }
  * 끌어서 놓기 + 탭-탭(카드 선택 후 자리 선택) + 키보드(Enter)를 한 번에 지원한다.
  * 놓을 자리는 요소에 `data-drop="<id>"`를 달아 두면 된다. 캔버스 밖에서 손을 떼도(pointercancel 포함) 끌기가 풀린다.
  */
-export function useDragDrop(onDrop: (cardId: string, targetId: string) => void, enabled = true) {
+/** 끌고 있는 카드 크기(무대 단위). 주면 커서 점이 아니라 카드가 가장 많이 겹친 자리를 고른다. */
+export interface GhostSize { w: number; h: number }
+
+/** 지금 놓으면 들어갈 자리: 카드가 가장 많이 겹친 `data-drop` 요소, 겹침이 적으면 커서 아래 요소 */
+function pickTarget(x: number, y: number, ghost?: GhostSize): string | null {
+  if (ghost) {
+    const sc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stage-scale')) || 1;
+    const w = ghost.w * sc, h = ghost.h * sc;
+    let best: { id: string; area: number } | null = null;
+    document.querySelectorAll<HTMLElement>('[data-drop]').forEach(el => {
+      const r = el.getBoundingClientRect();
+      const ix = Math.min(x + w / 2, r.right) - Math.max(x - w / 2, r.left);
+      const iy = Math.min(y + h / 2, r.bottom) - Math.max(y - h / 2, r.top);
+      const area = ix > 0 && iy > 0 ? ix * iy : 0;
+      if (area > (best?.area ?? 0)) best = { id: el.dataset.drop!, area };
+    });
+    const found = best as { id: string; area: number } | null;
+    if (found && found.area >= w * h * 0.15) return found.id;
+  }
+  const el = document.elementsFromPoint(x, y).find(n => (n as HTMLElement).dataset?.drop) as HTMLElement | undefined;
+  return el?.dataset.drop ?? null;
+}
+
+export function useDragDrop(onDrop: (cardId: string, targetId: string) => void, enabled = true, ghost?: GhostSize) {
   const [drag, setDrag] = useState<DragState | null>(null);
+  const [over, setOver] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const start = useRef<{ id: string; x: number; y: number; moved: boolean } | null>(null);
+  // 창 전체에서 포인터를 따라간다. 요소에만 걸면 카드가 다시 그려질 때 이동·뗌 이벤트를 놓쳐 그림자가 커서와 떨어진 채 남는다.
+  const latest = useRef({ onDrop, ghost });
+  latest.current = { onDrop, ghost };
+  const stop = useRef<(() => void) | null>(null);
 
-  const finish = useCallback((e: PointerEvent, cancel: boolean) => {
+  useEffect(() => () => stop.current?.(), []);
+
+  const finish = (x: number, y: number, cancel: boolean) => {
     const s = start.current;
     start.current = null;
+    stop.current?.();
     setDrag(null);
+    setOver(null);
     if (!s) return;
     if (!s.moved) { if (!cancel) setSelected(cur => (cur === s.id ? null : s.id)); return; }
     if (cancel) return;
-    const el = document.elementsFromPoint(e.clientX, e.clientY).find(n => (n as HTMLElement).dataset?.drop) as HTMLElement | undefined;
-    if (el?.dataset.drop) { setSelected(null); onDrop(s.id, el.dataset.drop); }
-  }, [onDrop]);
+    const target = pickTarget(x, y, latest.current.ghost);
+    if (target) { setSelected(null); latest.current.onDrop(s.id, target); }
+  };
 
   const bindCard = (id: string) => ({
     onPointerDown: (e: PointerEvent) => {
       if (!enabled) return;
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      stop.current?.();
       start.current = { id, x: e.clientX, y: e.clientY, moved: false };
+      const move = (ev: globalThis.PointerEvent) => {
+        const st = start.current;
+        if (!st) return;
+        if (ev.pointerType === 'mouse' && ev.buttons === 0) { finish(ev.clientX, ev.clientY, false); return; } // 놓친 마우스 뗌
+        if (!st.moved && Math.hypot(ev.clientX - st.x, ev.clientY - st.y) > 8) st.moved = true;
+        if (st.moved) { setDrag({ id, x: ev.clientX, y: ev.clientY }); setOver(pickTarget(ev.clientX, ev.clientY, latest.current.ghost)); }
+      };
+      const up = (ev: globalThis.PointerEvent) => finish(ev.clientX, ev.clientY, false);
+      const cancel = (ev: globalThis.PointerEvent) => finish(ev.clientX, ev.clientY, true);
+      const blur = () => finish(0, 0, true);
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', cancel);
+      window.addEventListener('blur', blur);
+      stop.current = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', cancel);
+        window.removeEventListener('blur', blur);
+        stop.current = null;
+      };
     },
-    onPointerMove: (e: PointerEvent) => {
-      const s = start.current;
-      if (!s) return;
-      if (!s.moved && Math.hypot(e.clientX - s.x, e.clientY - s.y) > 8) s.moved = true;
-      if (s.moved) setDrag({ id, x: e.clientX, y: e.clientY });
-    },
-    onPointerUp: (e: PointerEvent) => finish(e, false),
-    onPointerCancel: (e: PointerEvent) => finish(e, true),
     onKeyDown: (e: React.KeyboardEvent) => {
       if (enabled && !e.repeat && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setSelected(cur => (cur === id ? null : id)); }
     },
@@ -51,5 +96,5 @@ export function useDragDrop(onDrop: (cardId: string, targetId: string) => void, 
     onDrop(id, targetId);
   };
 
-  return { drag, selected, bindCard, placeSelected };
+  return { drag, over, selected, bindCard, placeSelected };
 }
