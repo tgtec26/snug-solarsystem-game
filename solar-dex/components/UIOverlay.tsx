@@ -31,10 +31,12 @@ export function UIOverlay() {
   }, [phase, lockMs]);
 
   // 의뢰판은 천문대 벽, 방 안은 그 방 배경. 그림이 없으면 기본 그라데이션만 보인다.
-  const bg = phase === 'board' ? 'observatory-wall' : phase === 'room' && room ? ROOM_BG[room] : undefined;
+  const SCENE: Partial<Record<string, string>> = { intro: 'intro-hall', result: 'observatory-wall', ending: 'ending-roof', summary: 'ending-roof' };
+  const bg = phase === 'board' ? 'observatory-wall' : phase === 'room' && room ? ROOM_BG[room] : SCENE[phase];
+  const dim = phase === 'intro' || phase === 'ending' || phase === 'summary' ? 0.3 : 0.62; // 대사·요약 장면은 배경을 더 살린다
   const base = 'radial-gradient(ellipse at 50% 120%, #1c2a5a 0%, #0a0f25 55%, #04060f 100%)';
   return (
-    <div className="absolute inset-0 text-white select-none" style={{ background: bg ? `linear-gradient(rgba(4,6,15,0.62), rgba(4,6,15,0.62)), url(/assets/bg/${bg}.webp) center / cover, ${base}` : base }}>
+    <div className="absolute inset-0 text-white select-none" style={{ background: bg ? `linear-gradient(rgba(4,6,15,${dim}), rgba(4,6,15,${dim})), url(/assets/bg/${bg}.webp) center / cover, ${base}` : base }}>
       <button
         type="button"
         aria-label="전체 화면"
