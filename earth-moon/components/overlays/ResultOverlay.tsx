@@ -29,6 +29,8 @@ export function ResultOverlay({ summary = false }: { summary?: boolean }) {
   }, [summary, total]);
   return (
     <div className="absolute inset-0 flex items-center justify-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/char/observer-cheer.webp" alt="" draggable={false} className="absolute right-10 bottom-0 h-[430px] pointer-events-none" />
       {(summary || (stars[current ?? ''] ?? 0) === 3) && <Confetti count={summary ? 90 : 40} />}
       <div ref={card} className="w-[760px] rounded-3xl bg-black/60 border-2 border-white/30 p-10 flex flex-col items-center gap-5">
         <div className="text-4xl font-bold">{summary ? '오늘의 관측 결과 · 지구와 달 모형' : '의뢰 완료'}</div>

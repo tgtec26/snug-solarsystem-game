@@ -95,7 +95,7 @@ export function ShadowOverlay({ onDone }: { onDone: (stars: number) => void }) {
           <clipPath id="farClip"><circle cx={far.x} cy={far.y} r={rFar} /></clipPath>
         </defs>
         {/* 받침판 (사선 시점) */}
-        <polygon points={`${BASE.x0 - 30},${BASE.y1 + 40} ${BASE.x1 + 30},${BASE.y1 + 40} ${BASE.x1 + 10},${BASE.y0 - 30} ${BASE.x0 - 10},${BASE.y0 - 30}`} fill="#1b2438" stroke="#334155" strokeWidth="4" />
+        <image href="/assets/base-plate.webp" x="110" y="70" width="700" height="467" />
         {/* 손전등 빛 */}
         <polygon points={`${SUN.x},${SUN.y - 36} ${SUN.x},${SUN.y + 36} 780,560 780,40`} fill="#ffd16614" />
         {kind && <line x1={SUN.x} y1={SUN.y} x2={far.x} y2={far.y} stroke="#86efac" strokeWidth="3" strokeDasharray="8 8" opacity="0.8" />}

@@ -18,7 +18,9 @@ export function DialogOverlay({ kind }: { kind: 'intro' | 'ending' }) {
       onClick={go}
       onKeyDown={e => { if (!e.repeat && (e.key === 'Enter' || e.key === ' ')) go(); }}
     >
-      <div className="w-[980px] rounded-3xl bg-black/60 border-2 border-white/30 px-10 py-8 text-left">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/char/keeper.webp" alt="" draggable={false} className="absolute left-10 bottom-0 h-[470px] pointer-events-none" />
+      <div className="w-[860px] ml-72 rounded-3xl bg-black/60 border-2 border-white/30 px-10 py-8 text-left">
         <div className="text-2xl font-bold text-yellow-200 mb-3">{dialog.npcName}</div>
         {lines.map(l => <p key={l} className="text-3xl leading-relaxed">{l}</p>)}
       </div>

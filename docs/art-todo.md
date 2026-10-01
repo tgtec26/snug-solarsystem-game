@@ -26,3 +26,10 @@
 - 방 배경(codex 생성 WebP, `public/assets/bg/`): 의뢰판 `observatory-wall`(두 게임), 게임 A `library`·`planet-hall`·`sun-deck`, 게임 B `dome`·`workshop`. `UIOverlay`가 의뢰판·방에 따라 깔고 어둡게 덮어 글씨를 살린다. 그림이 없으면 기본 그라데이션.
 - 천체 아이콘 14(`solar-dex/public/assets/icons/`): 행성 8(`planet-*`)·식구 6(`body-*`). 격자 시트로 생성해 잘라 화풍을 맞췄다. 식구 카드의 `body-planet`은 지구와 비슷해 보인다(필요하면 다시 요청).
 - 남은 교체: 태양 광구 그림(쌀알 무늬·흑점·채층·코로나·홍염·플레어), 차단판·받침판, 캐릭터 표정·망원경 자세·천문대지기, 벡터 12궁·별자리판.
+
+## 교체 완료 3차 (2026-10-01)
+- 캐릭터(두 게임 `public/assets/char/`): `keeper`(천문대지기, 대사 화면 왼쪽), `observer-cheer`(결과·요약 화면), `observer-scope`(망원경 조준 화면). 관측 대원의 머리 모양이 `observer.webp`와 조금 다르다(참고 이미지 첨부가 되지 않아 글로 설명해 생성). 필요하면 통일해서 다시 요청.
+- 장치: 게임 A `sun-surface`(태양 투영판의 태양 상), `blocker-plate`(차단판), 게임 B `base-plate`(그림자 모형 받침판).
+- 황도 12궁 선화 12종(게임 B `public/assets/zodiac/`): codex 생성 PNG를 WebP로 바꾼 **임시본**이다. 지침의 "벡터 직접 제작" 요구는 그대로 남아 있으며, 정식 벡터가 오면 같은 파일명으로 교체한다. 별자리판 4장 선화는 만들지 않았다(판은 가~라 글자로 표시).
+- 남은 것: 태양 활동 예보의 코로나·홍염·플레어 전용 그림(지금은 SVG 도형), 천문대지기 표정 변형, 학습 일지(도감) 화면.
+- 참고: codex 기본 모델(`~/.codex/config.toml`의 `gpt-6.1-sol`)이 ChatGPT 계정에서 거부되어 `-m gpt-6-astra`를 지정해 생성했다. 참고 이미지 첨부(`-i`)도 같은 오류를 냈다.

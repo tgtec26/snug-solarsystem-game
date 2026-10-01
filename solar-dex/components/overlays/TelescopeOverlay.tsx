@@ -111,6 +111,8 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/char/observer-scope.webp" alt="" draggable={false} className="absolute left-6 bottom-6 h-[360px] pointer-events-none" />
       <div className="text-3xl font-bold">{target.kind === 'moon' ? '달' : '행성'}을 찍어요 ({idx + 1}/{TARGETS.length})</div>
       <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <defs>

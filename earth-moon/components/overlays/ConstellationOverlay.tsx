@@ -106,7 +106,8 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
               return (
                 <g key={z.month} data-drop={`slot-${z.month}`} onClick={() => placeSelected(`slot-${z.month}`)} className="cursor-pointer">
                   <circle cx={p.x} cy={p.y} r="34" fill={done ? '#16653466' : '#ffffff14'} stroke={done ? '#86efac' : selected ? '#fde68a' : '#ffffff55'} strokeWidth="3" strokeDasharray={done ? undefined : '8 6'} />
-                  {done && <text x={p.x} y={p.y + 6} textAnchor="middle" fontSize="16" fontWeight="700" fill="#bbf7d0">{nameOf(done).replace('자리', '')}</text>}
+                  {done && <image href={`/assets/zodiac/${done}.webp`} x={p.x - 22} y={p.y - 30} width="44" height="44" />}
+                  {done && <text x={p.x} y={p.y + 26} textAnchor="middle" fontSize="14" fontWeight="700" fill="#bbf7d0">{nameOf(done).replace('자리', '')}</text>}
                   {done && <text x={p.x} y={p.y + 50} textAnchor="middle" fontSize="15" fill="#ffffffaa">{z.month}월</text>}
                 </g>
               );
@@ -123,7 +124,10 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
         {phase === 'ring' && <div className="w-full text-center text-xl text-yellow-200">{month}월 · 태양 쪽 {sunName} · 한밤중 남쪽 {nightName}</div>}
         {phase === 'ring' && <input type="range" min={1} max={12} step={1} value={month} onChange={e => setMonth(Number(e.target.value))} className="w-56 h-10 accent-yellow-300" aria-label="달" />}
         {phase === 'ring' && free.map(z => (
-          <button key={z.id} type="button" {...bindCard(z.id)} className={`px-3 py-1.5 rounded-lg text-lg font-bold touch-none cursor-grab text-black ${selected === z.id ? 'bg-yellow-300 ring-4 ring-yellow-100' : 'bg-yellow-100'}`} style={{ opacity: drag?.id === z.id ? 0.3 : 1 }}>{z.name}</button>
+          <button key={z.id} type="button" {...bindCard(z.id)} className={`px-3 py-1.5 rounded-lg text-lg font-bold touch-none cursor-grab text-black ${selected === z.id ? 'bg-yellow-300 ring-4 ring-yellow-100' : 'bg-yellow-100'}`} style={{ opacity: drag?.id === z.id ? 0.3 : 1 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/assets/zodiac/${z.id}.webp`} alt="" width={26} height={26} draggable={false} className="inline-block mr-1 pointer-events-none invert" />{z.name}
+          </button>
         ))}
         <div className="text-xl text-red-300 w-full text-center h-7">{msg}</div>
       </div>
