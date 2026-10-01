@@ -144,6 +144,11 @@ describe('그림자 모형 (252~253쪽)', () => {
     expect(eclipseKind(sun, { x: 200, y: 0 }, { x: 400, y: 0 }, cfg)).toEqual({ kind: 'lunar', degree: 'total' });
     expect(eclipseKind(sun, { x: 200, y: 0 }, { x: 400, y: 50 }, cfg)?.degree).toBe('partial');
   });
+  it('태양이 어느 쪽에 있든 일직선이면 식이 된다 (공전 궤도 위)', () => {
+    expect(eclipseKind(sun, { x: 0, y: -300 }, { x: 4, y: -200 }, cfg)).toEqual({ kind: 'solar', degree: 'total' });
+    expect(eclipseKind(sun, { x: 0, y: -300 }, { x: 4, y: -400 }, cfg)).toEqual({ kind: 'lunar', degree: 'total' });
+    expect(eclipseKind(sun, { x: 0, y: -300 }, { x: 100, y: -300 }, cfg)).toBeNull();
+  });
   it('태양이 가운데이거나 같은 쪽에 있으면 식이 없다', () => {
     expect(eclipseKind({ x: 200, y: 0 }, { x: 400, y: 0 }, { x: 0, y: 0 }, cfg)).toBeNull();
   });

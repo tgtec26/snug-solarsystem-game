@@ -11,7 +11,7 @@
     "tolerance": 40
   },
   "shadow": {
-    "totalTol": 14,
-    "partialTol": 48
+    "totalTol": 20,
+    "partialTol": 55
   }
 }

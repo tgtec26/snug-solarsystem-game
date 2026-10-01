@@ -100,17 +100,17 @@ export function isWaxing(pos: number): boolean {
 
 export type EclipseKind = { kind: 'solar' | 'lunar'; degree: 'total' | 'partial' };
 /**
- * 그림자 모형 (252~253쪽): x가 작을수록 태양(손전등)에 가깝다. 태양-달-지구면 일식, 태양-지구-달이면 월식.
- * 가운데 공이 태양과 먼 공을 잇는 직선에서 벗어난 거리로 전체(개기)·일부(부분)를 가른다.
+ * 그림자 모형 (252~253쪽): 태양에 가까운 공이 가운데면 일직선인지 본다. 태양-달-지구면 일식, 태양-지구-달이면 월식.
+ * 가운데 공이 태양과 먼 공을 잇는 직선에서 벗어난 거리로 전체(개기)·일부(부분)를 가른다. 가운데 공은 태양과 먼 공 사이에 있어야 한다.
  */
 export function eclipseKind(sun: { x: number; y: number }, earth: { x: number; y: number }, moon: { x: number; y: number }, cfg: MinigameConfig): EclipseKind | null {
-  const moonMiddle = earth.x > moon.x && moon.x > sun.x;
-  const earthMiddle = moon.x > earth.x && earth.x > sun.x;
-  if (!moonMiddle && !earthMiddle) return null;
+  const moonMiddle = Math.hypot(moon.x - sun.x, moon.y - sun.y) < Math.hypot(earth.x - sun.x, earth.y - sun.y);
   const mid = moonMiddle ? moon : earth;
   const far = moonMiddle ? earth : moon;
   const dx = far.x - sun.x, dy = far.y - sun.y;
   const len = Math.hypot(dx, dy);
+  const t = ((mid.x - sun.x) * dx + (mid.y - sun.y) * dy) / (len * len);
+  if (!(t > 0 && t < 1)) return null;
   const off = Math.abs((mid.x - sun.x) * dy - (mid.y - sun.y) * dx) / len;
   const { totalTol, partialTol } = cfg.shadow;
   const degree = off <= totalTol ? 'total' : off <= partialTol ? 'partial' : null;
