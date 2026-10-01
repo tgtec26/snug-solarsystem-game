@@ -41,3 +41,7 @@
 
 ## 대사·마무리 장면 배경 (2026-10-01)
 - `bg/intro-hall`(천문대 입구 홀, 인트로 대사), `bg/ending-roof`(동틀 무렵 옥상, 마무리 대사·요약), 결과 화면은 `observatory-wall`. 대사·요약 장면은 배경을 덜 어둡게(0.3), 조작 장면은 0.62로 덮는다(`UIOverlay`).
+
+## 관측 의뢰서 카드 (2026-10-01)
+- codex 생성: 양피지 카드(`orders/card-paper`), 완료 도장(`stamp-done`), 자물쇠(`lock`), 의뢰별 활동 그림 11장(`orders/<minigame id>.webp`: telescope·bodies·planets·comet·projection·forecast / earthSpin·dayStars·constellation·moonPhase·shadow). 카드는 그림으로 활동을 알려 주고, 잠김=흐림+자물쇠, 완료=도장+별, 다음 의뢰=반짝임.
+- 새 미니게임을 추가하면 `orders/<minigame id>.webp`를 같이 넣는다.
