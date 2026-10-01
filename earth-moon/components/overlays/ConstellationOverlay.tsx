@@ -152,9 +152,9 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
             {(() => { const e = pt(monthAngle(month) + 180, 150); return (
               <g>
                 <line x1={C.x} y1={C.y} x2={pt(monthAngle(month), 200).x} y2={pt(monthAngle(month), 200).y} stroke="#ffd16688" strokeWidth="3" strokeDasharray="4 6" />
-                <circle cx={e.x} cy={e.y} r="46" fill="none" stroke="#fde68a" strokeWidth="3" strokeDasharray="6 6" className={turned ? '' : 'animate-pulse'} />
-                <image href="/assets/earth-ball.webp" x={e.x - 36} y={e.y - 36} width="72" height="72" className="cursor-grab" />
-                <text x={e.x} y={e.y + 68} textAnchor="middle" fontSize="22" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="4" paintOrder="stroke">{month}월</text>
+                <circle cx={e.x} cy={e.y} r="26" fill="none" stroke="#fde68a" strokeWidth="3" strokeDasharray="6 6" className={turned ? '' : 'animate-pulse'} />
+                <image href="/assets/earth-ball.webp" x={e.x - 18} y={e.y - 18} width="36" height="36" className="cursor-grab" />
+                <text x={e.x} y={e.y + 46} textAnchor="middle" fontSize="22" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="4" paintOrder="stroke">{month}월</text>
               </g>); })()}
           </>
         )}
