@@ -19,3 +19,13 @@ html, body {
 @keyframes snug-fall { 0% { opacity: 1; translate: 0 0; } 100% { opacity: 0.9; translate: 40px 860px; rotate: 540deg; } }
 @keyframes burst { 0% { transform: scale(0.1); opacity: 0.9; } 100% { transform: scale(1.6); opacity: 0; } }
 .anim-burst { animation: burst 1.3s ease-out forwards; }
+
+.title-vignette { background: radial-gradient(ellipse at 50% 45%, rgba(4,6,15,0) 35%, rgba(4,6,15,0.65) 100%); }
+@keyframes title-twinkle { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@keyframes title-float { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-12px) rotate(1.5deg); } }
+@keyframes title-glow { 0%, 100% { filter: drop-shadow(0 0 14px rgba(253, 224, 71, 0.45)); } 50% { filter: drop-shadow(0 0 28px rgba(253, 224, 71, 0.85)); } }
+@keyframes title-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.title-twinkle { animation: title-twinkle 3.2s ease-in-out infinite; }
+.title-float { animation: title-float 7s ease-in-out infinite; }
+.title-glow { animation: title-glow 3.6s ease-in-out infinite; }
+.title-pulse { animation: title-pulse 1.8s ease-in-out infinite; }
