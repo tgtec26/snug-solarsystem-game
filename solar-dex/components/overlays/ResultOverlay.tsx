@@ -1,5 +1,6 @@
 'use client';
 
+import { Star } from '@snug/shared/src/Star';
 import { useEffect, useRef, useState } from 'react';
 import { sfx } from '@snug/shared/src/audio';
 import { saveCard } from '@snug/shared/src/saveCard';
@@ -47,7 +48,7 @@ export function ResultOverlay({ summary = false }: { summary?: boolean }) {
         ) : (
           <>
             <div className="text-2xl">{last?.title}</div>
-            <div className="flex gap-2 text-5xl text-yellow-400">{[1, 2, 3].map(n => <span key={n} className={n <= (stars[current ?? ''] ?? 0) ? 'anim-pop' : ''} style={{ opacity: n <= (stars[current ?? ''] ?? 0) ? 1 : 0.25, animationDelay: `${n * 0.25}s`, animationFillMode: 'backwards', display: 'inline-block' }}>★</span>)}</div>
+            <div className="flex gap-2 text-5xl text-yellow-400">{[1, 2, 3].map(n => <span key={n} className={n <= (stars[current ?? ''] ?? 0) ? 'anim-pop' : ''} style={{ opacity: n <= (stars[current ?? ''] ?? 0) ? 1 : 0.25, animationDelay: `${n * 0.25}s`, animationFillMode: 'backwards', display: 'inline-block' }}><Star /></span>)}</div>
             <button type="button" className="mt-4 px-10 py-4 rounded-2xl bg-yellow-300 text-black text-2xl font-bold" onClick={() => { if (!inputLock.isLocked()) next(); }}>다음</button>
           </>
         )}

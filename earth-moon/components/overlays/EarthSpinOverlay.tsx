@@ -10,11 +10,11 @@ const R = 150;
 const norm = (d: number) => ((d + 540) % 360) - 180;
 const STARS = Array.from({ length: 26 }, (_, i) => ({ x: (i * 137) % 800, y: 40 + ((i * 71) % 230), r: i % 4 === 0 ? 3 : 1.8 }));
 
-/** 지구 자전 돌리기 (244쪽): 지구를 끌어 서→동으로 돌리면 지구 시점의 별이 동→서로 흐른다. 한 바퀴 돌리고 시점을 한 번 바꾸면 통과. */
+/** 지구 자전 돌리기 (244쪽): 지구를 끌어 서쪽에서 동쪽으로 돌리면 지구 시점의 별이 동쪽에서 서쪽로 흐른다. 한 바퀴 돌리고 시점을 한 번 바꾸면 통과. */
 export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }) {
   const cfg = useDataStore(s => s.minigame)!;
   const [rot, setRot] = useState(0);         // 화면 회전각(도, 시계 방향 +)
-  const [total, setTotal] = useState(0);     // 서→동으로 돌린 누적각
+  const [total, setTotal] = useState(0);     // 서쪽에서 동쪽으로 돌린 누적각
   const [view, setView] = useState<'space' | 'earth'>('space');
   const [viewed, setViewed] = useState(false);
   const [mistakes, setMistakes] = useState(0);
@@ -27,7 +27,7 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
   const spin = (screenDelta: number) => {
     if (ok) return;
     setRot(r => r + screenDelta);
-    const east = -screenDelta; // 화면 시계 반대 방향 = 서→동
+    const east = -screenDelta; // 화면 시계 반대 방향 = 서쪽에서 동쪽
     if (!isEastward(east)) {
       wrong.current += Math.abs(screenDelta);
       if (wrong.current > 40) { wrong.current = 0; setMistakes(m => m + 1); sfx.error(); setMsg('지구는 서쪽에서 동쪽으로 돌아요'); }
@@ -69,7 +69,7 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
 
   const progress = Math.min(1, total / (cfg.earthSpin.turns * 360));
   const obs = { x: C.x + Math.cos(((rot - 90) * Math.PI) / 180) * R, y: C.y + Math.sin(((rot - 90) * Math.PI) / 180) * R };
-  const shift = (((total * 2.2) % 800) + 800) % 800; // 지구 시점: 별이 동→서(왼쪽→오른쪽)로 흐른다
+  const shift = (((total * 2.2) % 800) + 800) % 800; // 지구 시점: 별이 동쪽에서 서쪽(왼쪽에서 오른쪽)로 흐른다
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">

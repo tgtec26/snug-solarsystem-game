@@ -63,7 +63,7 @@ export function allOrdersDone(orders: Order[], completed: string[]): boolean {
   return orders.every(o => completed.includes(o.id));
 }
 
-/** 자전 누적: 서→동 방향 회전만 쌓는다 (244쪽). 반대로 돌리면 그대로 */
+/** 자전 누적: 서쪽에서 동쪽 방향 회전만 쌓는다 (244쪽). 반대로 돌리면 그대로 */
 export function spinAccumulate(total: number, deltaDeg: number): number {
   return isEastward(deltaDeg) ? total + deltaDeg : total;
 }
@@ -72,10 +72,10 @@ export function spinDone(total: number, turns: number): boolean {
 }
 
 export type SkyDirection = 'north' | 'east' | 'south' | 'west';
-/** 동쪽 하늘은 비스듬히 떠오르고, 남쪽은 동→서로 지나고, 서쪽은 비스듬히 진다 (245쪽). 화면 각도(도, 오른쪽 0°·아래 +90°) */
+/** 동쪽 하늘은 비스듬히 떠오르고, 남쪽은 동쪽에서 서쪽로 지나고, 서쪽은 비스듬히 진다 (245쪽). 화면 각도(도, 오른쪽 0°·아래 +90°) */
 const SKY_MOTION: Record<Exclude<SkyDirection, 'north'>, number> = { east: -60, south: 0, west: 60 };
 
-/** 북쪽 하늘: 북극성을 중심으로 시계 반대 방향 (245쪽). 화면 좌표(아래가 +y)에서 from→to가 중심 기준 시계 반대인지 */
+/** 북쪽 하늘: 북극성을 중심으로 시계 반대 방향 (245쪽). 화면 좌표(아래가 +y)에서 from에서 to가 중심 기준 시계 반대인지 */
 export function rotatesCounterclockwise(center: { x: number; y: number }, from: { x: number; y: number }, to: { x: number; y: number }): boolean {
   return (from.x - center.x) * (to.y - center.y) - (from.y - center.y) * (to.x - center.x) < 0;
 }

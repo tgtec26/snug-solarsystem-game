@@ -1,5 +1,6 @@
 'use client';
 
+import { Star } from '@snug/shared/src/Star';
 import { useGameStore } from '@/game/store';
 import { orderUnlocked } from '@/game/rules';
 import { inputLock } from '@/components/UIOverlay';
@@ -39,7 +40,7 @@ export function OrderBoardOverlay() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/assets/orders/stamp-done.webp" alt="" draggable={false} className="absolute right-3 top-8 w-[84px] h-[84px] pointer-events-none anim-pop" />
                   <div className="absolute left-0 right-0 bottom-5 flex justify-center gap-1 text-3xl text-amber-500" aria-label={`별 ${stars[o.id] ?? 0}개`}>
-                    {[1, 2, 3].map(n => <span key={n} style={{ opacity: n <= (stars[o.id] ?? 0) ? 1 : 0.25 }}>★</span>)}
+                    {[1, 2, 3].map(n => <span key={n} style={{ opacity: n <= (stars[o.id] ?? 0) ? 1 : 0.25 }}><Star /></span>)}
                   </div>
                 </>
               )}

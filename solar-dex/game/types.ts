@@ -20,7 +20,7 @@ export interface MinigameConfig {
   inputLockMs: number; stars: { two: number; three: number };
   bodies: { cards: number };
   comet: { tolerance: number; ranks: number[] };
-  telescope: { aimRadius: number; focusTolerance: number; sunGuard: number };
+  telescope: { aimRadius: number; focusTolerance: number; sunGuard: number; tipGain: number };
   projection: { aimRadius: number; focusTolerance: number };
 }
 

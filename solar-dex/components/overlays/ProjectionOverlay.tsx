@@ -17,7 +17,7 @@ const SPOTS = [
   { id: 'granule', label: '쌀알 무늬', dx: -20, dy: 80 },
 ];
 
-/** 태양 투영판 (236~237쪽): 차단판 끼우기 → 경통을 끌어 상을 종이 가운데로 → 초점 → 흑점·쌀알 무늬 찾기. */
+/** 태양 투영판 (236~237쪽): 차단판 끼우기, 그다음 경통을 끌어 상을 종이 가운데로, 그다음 초점, 그다음 흑점·쌀알 무늬 찾기. */
 export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void }) {
   const cfg = useDataStore(s => s.minigame)!;
   const p = cfg.projection;

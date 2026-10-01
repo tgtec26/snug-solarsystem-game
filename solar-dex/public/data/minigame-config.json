@@ -19,7 +19,8 @@
   "telescope": {
     "aimRadius": 40,
     "focusTolerance": 0.3,
-    "sunGuard": 90
+    "sunGuard": 90,
+    "tipGain": 2
   },
   "projection": {
     "aimRadius": 30,

@@ -10,7 +10,7 @@ import { MoonDisc } from '@/components/MoonDisc';
 const E = { x: 320, y: 300 };
 const ORBIT = 185;
 const LABELS = ['삭', '초승달', '상현달', '보름달', '하현달', '그믐달'];
-// 화면 좌표: 태양은 오른쪽, 위치 1→8은 시계 반대 방향(위쪽으로 올라감)
+// 화면 좌표: 태양은 오른쪽, 위치 1에서 8은 시계 반대 방향(위쪽으로 올라감)
 const at = (pos: number, rad = ORBIT) => { const a = (moonPositionAngle(pos) * Math.PI) / 180; return { x: E.x + Math.cos(a) * rad, y: E.y - Math.sin(a) * rad }; };
 
 /** 달 위상판 (248~250쪽): 달을 끌어 8개 위치를 돌아보고, 이름표를 위치에 붙인다. */

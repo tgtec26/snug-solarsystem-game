@@ -91,6 +91,7 @@ export function validateMinigame(c: MinigameConfig): string[] {
   if (!t || !isNum(t.aimRadius) || t.aimRadius < 15 || t.aimRadius > 80) errs.push('minigame: telescope.aimRadius는 15~80');
   if (!t || !isNum(t.focusTolerance) || t.focusTolerance <= 0.1 || t.focusTolerance > 0.6) errs.push('minigame: telescope.focusTolerance는 0.1 초과~0.6');
   if (!t || !isNum(t.sunGuard) || t.sunGuard < 40 || t.sunGuard > 200) errs.push('minigame: telescope.sunGuard는 40~200');
+  if (!t || !isNum(t.tipGain) || t.tipGain < 1 || t.tipGain > 4) errs.push('minigame: telescope.tipGain은 1~4');
   const p = c.projection;
   if (!p || !isNum(p.aimRadius) || p.aimRadius < 15 || p.aimRadius > 80) errs.push('minigame: projection.aimRadius는 15~80');
   if (!p || !isNum(p.focusTolerance) || p.focusTolerance <= 0.1 || p.focusTolerance > 0.6) errs.push('minigame: projection.focusTolerance는 0.1 초과~0.6');
