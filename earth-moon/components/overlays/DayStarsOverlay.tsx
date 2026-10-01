@@ -11,6 +11,24 @@ const POLE = { x: 400, y: 330 };
 // 별: 북쪽은 북극성 둘레, 나머지는 방향별 이동 벡터(1시간 이동량)
 const STARS = [{ a: 20, r: 90 }, { a: 140, r: 150 }, { a: 250, r: 210 }, { a: 330, r: 130 }, { a: 70, r: 250 }];
 const STEP: Record<Exclude<SkyDirection, 'north'>, { dx: number; dy: number }> = { east: { dx: 17, dy: -28 }, south: { dx: 34, dy: 0 }, west: { dx: 17, dy: 28 } };
+const SIDE: Record<SkyDirection, [string, string]> = { north: ['서쪽', '동쪽'], east: ['북쪽', '남쪽'], south: ['동쪽', '서쪽'], west: ['남쪽', '북쪽'] };
+/** 관측은 저녁 8시에 시작해 1시간 간격 (244~245쪽 탐구의 1시간 간격) */
+const clock = (h: number, short = false) => {
+  const t = (20 + h) % 24;
+  const n = t % 12 === 0 ? 12 : t % 12;
+  return short ? `${n}시` : `${t >= 20 || t < 5 ? '밤' : '새벽'} ${n}시`;
+};
+/** 별 모양: 가는 네 갈래 빛줄기와 번지는 빛 */
+function StarShape({ x, y, r, ring = false }: { x: number; y: number; r: number; ring?: boolean }) {
+  const R = r * 2.4, q = r * 0.5;
+  return (
+    <g>
+      <circle cx={x} cy={y} r={r * 3.2} fill="url(#starGlow)" />
+      <path d={`M${x} ${y - R} L${x + q * 0.6} ${y - q * 0.6} L${x + R} ${y} L${x + q * 0.6} ${y + q * 0.6} L${x} ${y + R} L${x - q * 0.6} ${y + q * 0.6} L${x - R} ${y} L${x - q * 0.6} ${y - q * 0.6} Z`} fill="#fffbe6" stroke="#fde68a" strokeWidth="1" />
+      {ring && <circle cx={x} cy={y} r={R + 6} fill="none" stroke="#fde68a" strokeWidth="2" strokeDasharray="4 5" opacity="0.7" />}
+    </g>
+  );
+}
 const GRID = [[100, 420], [260, 330], [420, 400], [560, 300], [680, 420], [200, 200], [470, 210], [330, 470]];
 
 /** 하루 동안 별 (244~245쪽): 시간 슬라이더로 하늘을 움직여 본 뒤, 별을 끌어 이동 방향을 그린다. 북쪽은 북극성 둘레를 시계 반대로. */
@@ -28,10 +46,17 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
   const [line, setLine] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const dir = ORDER[idx];
 
-  const pos = (i: number) => {
-    if (dir === 'north') { const s = STARS[i]; const a = ((s.a - hour * 15) * Math.PI) / 180; return { x: POLE.x + Math.cos(a) * s.r, y: POLE.y + Math.sin(a) * s.r }; }
+  const posAt = (i: number, h: number) => {
+    if (dir === 'north') { const s = STARS[i]; const a = ((s.a - h * 15) * Math.PI) / 180; return { x: POLE.x + Math.cos(a) * s.r, y: POLE.y + Math.sin(a) * s.r }; }
     const g = GRID[i]; const st = STEP[dir];
-    return { x: g[0] + st.dx * hour - 100, y: g[1] + st.dy * hour };
+    return { x: g[0] + st.dx * h - 100, y: g[1] + st.dy * h };
+  };
+  const pos = (i: number) => posAt(i, hour);
+  /** 지금까지 지나온 길(파선): 북쪽은 북극성 둘레의 호, 나머지는 곧은 길 */
+  const trail = (i: number) => {
+    const pts: string[] = [];
+    for (let h = 0; h <= hour + 1e-6; h += 0.25) { const q = posAt(i, Math.min(h, hour)); pts.push(`${q.x.toFixed(1)},${q.y.toFixed(1)}`); }
+    return pts.join(' ');
   };
   const toSvg = (e: PointerEvent) => {
     const r = svg.current!.getBoundingClientRect();
@@ -97,17 +122,40 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
         {ORDER.map((d, i) => <div key={d} className={`px-5 py-2 rounded-xl text-xl font-bold ${good.includes(d) ? 'bg-emerald-400 text-black anim-pop' : i === idx ? 'bg-yellow-300 text-black' : 'bg-white/10'}`}>{NAMES[d]}</div>)}
       </div>
       <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-        <defs><radialGradient id="dome" cx="0.5" cy="1" r="1"><stop offset="0" stopColor="#1b2a5a" /><stop offset="1" stopColor="#05070f" /></radialGradient></defs>
-        <rect x="0" y="0" width="800" height="600" fill="url(#dome)" />
-        <ellipse cx="400" cy="600" rx="520" ry="70" fill="#1f3b27" />
-        {dir === 'north' && <circle cx={POLE.x} cy={POLE.y} r="9" fill="#fde68a" />}
-        {Array.from({ length: n }).map((_, i) => { const p = pos(i); return <circle key={i} cx={p.x} cy={p.y} r={i === 0 ? 10 : 7} fill="#fff" stroke="#fde68a" strokeWidth={moved && !done ? 3 : 0} />; })}
+        <defs>
+          <radialGradient id="starGlow"><stop offset="0" stopColor="#fff7c2" stopOpacity="0.85" /><stop offset="1" stopColor="#fde68a" stopOpacity="0" /></radialGradient>
+        </defs>
+        <rect x="0" y="0" width="800" height="600" fill="#05070f" />
+        <image href={`/assets/sky/sky-${dir}.webp`} x="0" y="0" width="800" height="600" preserveAspectRatio="xMidYMid slice" />
+        {dir === 'north' && <StarShape x={POLE.x} y={POLE.y} r={9} />}
+        {/* 지나온 길 */}
+        {hour > 0 && Array.from({ length: n }).map((_, i) => {
+          const p0 = posAt(i, 0);
+          return (
+            <g key={`t${i}`}>
+              <polyline points={trail(i)} fill="none" stroke="#fde68a" strokeWidth="2.5" strokeDasharray="7 9" strokeLinecap="round" opacity="0.8" />
+              <circle cx={p0.x} cy={p0.y} r="6" fill="none" stroke="#fde68a" strokeWidth="2" opacity="0.6" />
+            </g>
+          );
+        })}
+        {Array.from({ length: n }).map((_, i) => { const p = pos(i); return <StarShape key={i} x={p.x} y={p.y} r={i === 0 ? 8 : 6} ring={moved && !done} />; })}
         {line && <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke="#fde68a" strokeWidth="6" strokeLinecap="round" />}
+        {/* 방향 표지: 지금 보는 방향의 왼쪽·오른쪽이 어느 쪽인지 */}
+        <g fontSize="26" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="5" paintOrder="stroke">
+          <text x="26" y="560">{SIDE[dir][0]}</text>
+          <text x="774" y="560" textAnchor="end">{SIDE[dir][1]}</text>
+        </g>
         {done && <circle cx="400" cy="300" r="60" fill="#86efac" className="anim-sparkle" style={{ transformOrigin: '400px 300px' }} />}
       </svg>
-      <div className="flex items-center gap-6 h-16">
-        <input type="range" min={0} max={6} step={1} value={hour} onChange={e => { setHour(Number(e.target.value)); if (Number(e.target.value) > 0) setMoved(true); }} className="w-96 h-10 accent-yellow-300" aria-label="시간" />
-        <div className="text-xl text-red-300 w-[28rem]">{msg}</div>
+      <div className="flex flex-col items-center gap-1 w-[640px]">
+        <div className="text-2xl font-bold text-yellow-200">{clock(hour)}</div>
+        <input type="range" min={0} max={6} step={1} value={hour} onChange={e => { setHour(Number(e.target.value)); if (Number(e.target.value) > 0) setMoved(true); }} className="w-full h-8 accent-yellow-300" aria-label="시간" />
+        <div className="flex justify-between w-full text-base text-white/80 px-1">
+          {Array.from({ length: 7 }).map((_, h) => <span key={h} className={h === hour ? 'text-yellow-300 font-bold' : ''}>{clock(h, true)}</span>)}
+        </div>
+        <svg viewBox="0 0 320 20" width="320" height="20" aria-hidden><line x1="6" y1="10" x2="300" y2="10" stroke="#fde68a" strokeWidth="3" strokeLinecap="round" /><polygon points="296,3 314,10 296,17" fill="#fde68a" /></svg>
+        <div className="text-base text-white/80 -mt-1">시간의 흐름</div>
+        <div className="text-xl text-red-300 h-7">{msg}</div>
       </div>
     </div>
   );
