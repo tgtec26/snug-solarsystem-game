@@ -4,31 +4,16 @@ import { DragGhost } from '@snug/shared/src/DragGhost';
 import { sfx } from '@snug/shared/src/audio';
 import { useState } from 'react';
 import { useDragDrop } from '@snug/shared/src/useDragDrop';
+import { ArtCard } from '@/components/ArtCard';
 import { useDataStore } from '@/game/dataStore';
 import { criterionValue, sortPlacement, starsFor } from '@/game/rules';
 
 type Box = 'A' | 'B';
 const CARD_W = 138;
 
-/**
- * 행성 카드: 그 행성의 실제 모습을 배경으로 한 그림 + 카드 테두리 + 아래 이름판.
- * 세로가 가로의 1.5배. 글자 크기는 가로에 비례한다.
- */
-function PlanetCard({ id, name, w, chips = [], faded = false }: { id: string; name: string; w: number; chips?: string[]; faded?: boolean }) {
-  return (
-    <div className="relative select-none" style={{ width: w, height: w * 1.5, opacity: faded ? 0.35 : 1 }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`/assets/planetcards/${id}.webp`} alt="" draggable={false} className="absolute pointer-events-none rounded-lg object-cover" style={{ inset: w * 0.03, width: w * 0.94, height: w * 1.44 }} />
-      {chips.length > 0 && (
-        <div className="absolute left-0 right-0 flex flex-col items-center gap-0.5 pointer-events-none" style={{ bottom: w * 0.27 }}>
-          {chips.map((c, i) => <div key={i} className="rounded bg-black/65 text-white font-bold px-1.5" style={{ fontSize: w * 0.085 }}>{c}</div>)}
-        </div>
-      )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/assets/planetcards/frame.webp" alt="" draggable={false} className="absolute inset-0 w-full h-full pointer-events-none" />
-      <div className="absolute left-0 right-0 text-center font-bold text-yellow-100 pointer-events-none" style={{ bottom: w * 0.075, fontSize: w * 0.15, textShadow: '0 2px 4px #000' }}>{name}</div>
-    </div>
-  );
+/** 행성 카드: 그 행성의 실제 모습을 배경으로 한 그림 카드 */
+function PlanetCard({ id, name, w, chips, faded }: { id: string; name: string; w: number; chips?: string[]; faded?: boolean }) {
+  return <ArtCard art={`/assets/planetcards/${id}.webp`} name={name} w={w} chips={chips} faded={faded} />;
 }
 
 /** 행성 나눔판 (234~235쪽): 기준 스위치를 켜 특징을 보고, 행성 카드를 두 상자로 나눈다. */
