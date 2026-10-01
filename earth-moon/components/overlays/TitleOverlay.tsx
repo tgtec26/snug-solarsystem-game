@@ -23,18 +23,18 @@ export function TitleOverlay() {
       <img src="/assets/title/title-stars.webp" alt="" draggable={false} className="absolute inset-0 w-full h-full object-cover opacity-80 title-twinkle pointer-events-none" />
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/title/title-emblem-earthmoon.webp" alt="" draggable={false} className="w-[310px] h-[310px] mt-6 title-float pointer-events-none" />
+        <img src="/assets/title/title-emblem-earthmoon.webp" alt="" draggable={false} className="w-[270px] h-[270px] mt-4 title-float pointer-events-none" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/title/title-logo.webp" alt="별빛 천문대" draggable={false} className="w-[600px] -mt-6 title-glow pointer-events-none" />
         <div className="relative -mt-2 w-[340px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/title/title-ribbon.webp" alt="" draggable={false} className="w-full pointer-events-none" />
-          <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-yellow-100 tracking-wide" style={{ textShadow: '0 2px 6px #000' }}>지구와 달 모형</div>
+          <div className="absolute left-0 right-0 top-[62%] -translate-y-1/2 flex items-center justify-center text-2xl font-bold text-yellow-100 tracking-wide" style={{ textShadow: '0 2px 6px #000' }}>지구와 달 모형</div>
         </div>
         <div className="relative mt-3 w-[300px] title-pulse">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/title/title-button.webp" alt="" draggable={false} className="w-full pointer-events-none" />
-          <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-[#3b2400]">화면을 눌러 시작</div>
+          <div className="absolute left-0 right-0 top-[69%] -translate-y-1/2 flex items-center justify-center text-2xl font-bold text-[#3b2400]">화면을 눌러 시작</div>
         </div>
       </div>
     </button>
