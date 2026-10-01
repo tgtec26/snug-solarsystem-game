@@ -11,6 +11,7 @@ import { DialogOverlay } from '@/components/overlays/DialogOverlay';
 import { OrderBoardOverlay } from '@/components/overlays/OrderBoardOverlay';
 import { RoomPlaceholder } from '@/components/overlays/RoomPlaceholder';
 import { ResultOverlay } from '@/components/overlays/ResultOverlay';
+import { FinaleOverlay } from '@/components/overlays/FinaleOverlay';
 
 /** 화면이 바뀐 직후 연타가 다음 화면으로 넘어가지 않도록 입력을 잠깐 잠근다 */
 export const inputLock = createInputLock();
@@ -58,6 +59,7 @@ export function UIOverlay() {
       {phase === 'board' && <OrderBoardOverlay />}
       {phase === 'room' && <RoomPlaceholder />}
       {phase === 'result' && <ResultOverlay />}
+      {phase === 'finale' && <FinaleOverlay />}
       {phase === 'ending' && <DialogOverlay kind="ending" />}
       {phase === 'summary' && <ResultOverlay summary />}
     </div>

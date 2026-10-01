@@ -28,7 +28,7 @@ const fresh = (): GameState => ({
   phase: 'title', orders: [], current: null, completed: [], stars: {}, newCards: [], startedAt: null, elapsedMs: 0,
 });
 /** 버튼·연출이 끝나면 넘어가는 단순 전이 */
-const NEXT: Partial<Record<Phase, Phase>> = { intro: 'board', ending: 'summary' };
+const NEXT: Partial<Record<Phase, Phase>> = { intro: 'board', finale: 'ending', ending: 'summary' };
 
 export const useGameStore = create<GameState & Actions>()(persist((set) => ({
   ...fresh(),
@@ -36,7 +36,7 @@ export const useGameStore = create<GameState & Actions>()(persist((set) => ({
   next: () => set(s => {
     if (s.phase === 'result') {
       return allOrdersDone(s.orders, s.completed)
-        ? { phase: 'ending', current: null, elapsedMs: s.startedAt ? Date.now() - s.startedAt : 0 }
+        ? { phase: 'finale', current: null, elapsedMs: s.startedAt ? Date.now() - s.startedAt : 0 }
         : { phase: 'board', current: null };
     }
     const to = NEXT[s.phase];

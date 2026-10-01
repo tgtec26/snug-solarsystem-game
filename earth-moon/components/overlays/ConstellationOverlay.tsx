@@ -28,6 +28,8 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
   const [flash, setFlash] = useState(false);
   const svg = useRef<SVGSVGElement>(null);
   const dragging = useRef(false);
+  const seatRef = useRef(0); // 손을 뗄 때 최신 자리로 판정
+  const pick = (s: number) => { seatRef.current = s; setSeat(s); };
   const TOTAL = targets.length + sky.zodiac.length;
 
   const view = chairBoards(sky, sky.boards[seat].id)!;
@@ -45,14 +47,14 @@ export function ConstellationOverlay({ onDone }: { onDone: (stars: number) => vo
     const r = svg.current!.getBoundingClientRect();
     return (Math.atan2(-(((e.clientY - r.top) / r.height) * 600 - C.y), ((e.clientX - r.left) / r.width) * 800 - C.x) * 180) / Math.PI - 90;
   };
-  const down = (e: PointerEvent<SVGSVGElement>) => { if (phase !== 'chair') return; (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); dragging.current = true; setSeat(nearestSlot(angleAt(e), 4)); };
-  const move = (e: PointerEvent<SVGSVGElement>) => { if (dragging.current) setSeat(nearestSlot(angleAt(e), 4)); };
-  const up = () => { if (!dragging.current) return; dragging.current = false; confirmSeat(seat); };
+  const down = (e: PointerEvent<SVGSVGElement>) => { if (phase !== 'chair') return; (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId); dragging.current = true; pick(nearestSlot(angleAt(e), 4)); };
+  const move = (e: PointerEvent<SVGSVGElement>) => { if (dragging.current) pick(nearestSlot(angleAt(e), 4)); };
+  const up = () => { if (!dragging.current) return; dragging.current = false; confirmSeat(seatRef.current); };
   const key = (e: React.KeyboardEvent) => {
     if (e.repeat || phase !== 'chair') return;
-    if (e.key === 'ArrowLeft') setSeat(s => (s + 1) % 4);
-    else if (e.key === 'ArrowRight') setSeat(s => (s + 3) % 4);
-    else if (e.key === 'Enter') confirmSeat(seat);
+    if (e.key === 'ArrowLeft') pick((seatRef.current + 1) % 4);
+    else if (e.key === 'ArrowRight') pick((seatRef.current + 3) % 4);
+    else if (e.key === 'Enter') confirmSeat(seatRef.current);
   };
 
   const { drag, selected, bindCard, placeSelected } = useDragDrop((id, slot) => {

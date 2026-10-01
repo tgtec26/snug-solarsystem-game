@@ -29,6 +29,7 @@ export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void 
   const [msg, setMsg] = useState('');
   const drag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
   const svg = useRef<SVGSVGElement>(null);
+  const panRef = useRef({ x: 150, y: -110 }); // 손을 뗄 때 최신 위치로 판정
   const sharp = focusSharp(focus, BEST, p.focusTolerance);
   const img = { x: C.x + pan.x, y: C.y + pan.y };
 
@@ -60,17 +61,18 @@ export function ProjectionOverlay({ onDone }: { onDone: (stars: number) => void 
   const move = (e: PointerEvent<SVGSVGElement>) => {
     const d = drag.current; if (!d) return;
     const pt = toSvg(e);
-    setPan({ x: d.ox + pt.x - d.sx, y: d.oy + pt.y - d.sy });
+    panRef.current = { x: d.ox + pt.x - d.sx, y: d.oy + pt.y - d.sy };
+    setPan(panRef.current);
   };
   const settle = (n: { x: number; y: number }) => { if (Math.hypot(n.x, n.y) <= p.aimRadius) setStage('focus'); };
-  const up = () => { if (drag.current) { drag.current = null; settle(pan); } };
+  const up = () => { if (drag.current) { drag.current = null; settle(panRef.current); } };
 
   const key = (e: React.KeyboardEvent) => {
     if (e.repeat) return;
     if (stage === 'plate' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setStage('aim'); return; }
     if (stage === 'aim') {
       const dir: Record<string, [number, number]> = { ArrowLeft: [-14, 0], ArrowRight: [14, 0], ArrowUp: [0, -14], ArrowDown: [0, 14] };
-      const v = dir[e.key]; if (v) { e.preventDefault(); const n = { x: pan.x + v[0], y: pan.y + v[1] }; setPan(n); settle(n); }
+      const v = dir[e.key]; if (v) { e.preventDefault(); const n = { x: panRef.current.x + v[0], y: panRef.current.y + v[1] }; panRef.current = n; setPan(n); settle(n); }
     }
   };
   const onFocus = (v: number) => {

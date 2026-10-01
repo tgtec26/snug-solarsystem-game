@@ -1,4 +1,4 @@
-export type Phase = 'title' | 'intro' | 'board' | 'room' | 'result' | 'ending' | 'summary';
+export type Phase = 'title' | 'intro' | 'board' | 'room' | 'result' | 'finale' | 'ending' | 'summary';
 
 export interface ZodiacSlot { month: number; id: string; name: string; page: number; verified: boolean }
 export interface ChairBoard { id: string; name: string; label: string; page: number }

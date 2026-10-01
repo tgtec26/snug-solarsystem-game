@@ -39,9 +39,11 @@ describe('store 전이', () => {
     expect(s().newCards).toEqual([]);
     expect(journal.load()).toHaveLength(1);
   });
-  it('마지막 의뢰 뒤 ending → summary', () => {
+  it('마지막 의뢰 뒤 finale → ending → summary', () => {
     s().start(O); s().next();
     for (const o of O) { s().acceptOrder(o.id); s().completeRoom(o.id, 3); s().next(); }
+    expect(s().phase).toBe('finale');
+    s().next();
     expect(s().phase).toBe('ending');
     s().next();
     expect(s().phase).toBe('summary');

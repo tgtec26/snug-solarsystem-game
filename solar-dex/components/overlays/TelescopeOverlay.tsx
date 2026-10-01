@@ -28,6 +28,8 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
   const [msg, setMsg] = useState('');
   const drag = useRef<{ kind: 'cap' | 'pan'; sx: number; sy: number; ox: number; oy: number } | null>(null);
   const svg = useRef<SVGSVGElement>(null);
+  const panRef = useRef({ x: 0, y: 0 }); // 손을 뗄 때 최신 위치로 판정
+  const capRef = useRef({ x: 0, y: 0 });
   const target = TARGETS[idx];
   const screenPos = (w: { x: number; y: number }, p = pan) => ({ x: w.x + p.x, y: w.y + p.y });
   const pos = screenPos(target.world);
@@ -39,13 +41,14 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
   };
   const tryPan = (next: { x: number; y: number }) => {
     // 빠르게 끌어도 태양 가까이를 건너뛰지 못하게 경로를 따라 확인한다
-    const steps = Math.max(1, Math.ceil(distance(pan, next) / 10));
+    const from = panRef.current;
+    const steps = Math.max(1, Math.ceil(distance(from, next) / 10));
     for (let i = 1; i <= steps; i++) {
-      const q = { x: pan.x + ((next.x - pan.x) * i) / steps, y: pan.y + ((next.y - pan.y) * i) / steps };
+      const q = { x: from.x + ((next.x - from.x) * i) / steps, y: from.y + ((next.y - from.y) * i) / steps };
       const check = telescopeSunCheck({ x: SUN_WORLD.x + q.x, y: SUN_WORLD.y + q.y }, C, t.sunGuard);
       if (!check.ok) { setMistakes(m => m + 1); sfx.error(); setMsg(check.reason); return false; }
     }
-    setMsg(''); setPan(next); return true;
+    setMsg(''); panRef.current = next; setPan(next); return true;
   };
 
   const down = (e: PointerEvent<SVGSVGElement>) => {
@@ -58,14 +61,14 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
     const d = drag.current; if (!d) return;
     const p = toSvg(e);
     const dx = p.x - d.sx, dy = p.y - d.sy;
-    if (d.kind === 'cap') setCap({ x: d.ox + dx, y: d.oy + dy });
+    if (d.kind === 'cap') { capRef.current = { x: d.ox + dx, y: d.oy + dy }; setCap(capRef.current); }
     else tryPan({ x: d.ox + dx, y: d.oy + dy });
   };
   const up = () => {
     const d = drag.current; drag.current = null;
     if (d?.kind === 'cap') {
-      if (Math.hypot(cap.x, cap.y) > 150) setStage('aim'); else setCap({ x: 0, y: 0 });
-    } else if (d?.kind === 'pan') settle(pan);
+      if (Math.hypot(capRef.current.x, capRef.current.y) > 150) setStage('aim'); else { capRef.current = { x: 0, y: 0 }; setCap({ x: 0, y: 0 }); }
+    } else if (d?.kind === 'pan') settle(panRef.current);
   };
   /** 손을 뗀 뒤(또는 키를 누른 뒤) 중앙 원 안이면 접안렌즈로 */
   const settle = (p: { x: number; y: number }) => {
@@ -79,7 +82,7 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
     if (stage === 'cap' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setStage('aim'); return; }
     if (stage === 'aim') {
       const dir: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
-      const v = dir[e.key]; if (v) { e.preventDefault(); const n = { x: pan.x + v[0], y: pan.y + v[1] }; if (tryPan(n)) settle(n); }
+      const v = dir[e.key]; if (v) { e.preventDefault(); const n = { x: panRef.current.x + v[0], y: panRef.current.y + v[1] }; if (tryPan(n)) settle(n); }
     }
     if (stage === 'focus') {
       if (e.key === 'ArrowLeft') setFocus(f => Math.max(0, f - 0.04));
@@ -96,7 +99,7 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
     setScores(next); setMsg(''); setStage('shot'); sfx.correct();
     window.setTimeout(() => {
       if (idx + 1 >= TARGETS.length) onDone(starsFor(next.reduce((a, b) => a + b, 0) / next.length, mistakes === 0, cfg));
-      else { setIdx(idx + 1); setPan({ x: 0, y: 0 }); setFocus(0.05); setStage('aim'); }
+      else { setIdx(idx + 1); panRef.current = { x: 0, y: 0 }; setPan({ x: 0, y: 0 }); setFocus(0.05); setStage('aim'); }
     }, 1100);
   };
 

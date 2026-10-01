@@ -26,6 +26,8 @@ export function ShadowOverlay({ onDone }: { onDone: (stars: number) => void }) {
   const [misses, setMisses] = useState(0);
   const [last, setLast] = useState<EclipseKind | null>(null);
   const svg = useRef<SVGSVGElement>(null);
+  const grabRef = useRef<'earth' | 'moon' | null>(null);
+  const live = useRef({ earth: { x: 600, y: 420 }, moon: { x: 380, y: 200 } }); // 손을 뗄 때 최신 위치로 판정한다
   const kind = eclipseKind(SUN, earth, moon, cfg);
 
   const toSvg = (e: PointerEvent) => {
@@ -37,20 +39,25 @@ export function ShadowOverlay({ onDone }: { onDone: (stars: number) => void }) {
     const de = Math.hypot(p.x - earth.x, p.y - earth.y), dm = Math.hypot(p.x - moon.x, p.y - moon.y);
     if (Math.min(de, dm) > 70) return;
     (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId);
-    setGrab(dm <= de ? 'moon' : 'earth');
+    grabRef.current = dm <= de ? 'moon' : 'earth';
+    setGrab(grabRef.current);
   };
   const move = (e: PointerEvent<SVGSVGElement>) => {
-    if (!grab) return;
+    const g = grabRef.current;
+    if (!g) return;
     const p = toSvg(e);
     const n = { x: cl(p.x, BASE.x0, BASE.x1), y: cl(p.y, BASE.y0, BASE.y1) };
-    if (grab === 'earth') setEarth(n); else setMoon(n);
+    live.current[g] = n;
+    if (g === 'earth') setEarth(n); else setMoon(n);
   };
   const up = () => {
-    if (!grab) return;
+    if (!grabRef.current) return;
+    grabRef.current = null;
     setGrab(null);
-    if (!kind) { setMisses(m => m + 1); return; }
-    setLast(kind);
-    const t = TYPES.find(x => x.k.kind === kind.kind && x.k.degree === kind.degree)!;
+    const hit = eclipseKind(SUN, live.current.earth, live.current.moon, cfg);
+    if (!hit) { setMisses(m => m + 1); return; }
+    setLast(hit);
+    const t = TYPES.find(x => x.k.kind === hit.kind && x.k.degree === hit.degree)!;
     if (made.includes(t.id)) return;
     const next = [...made, t.id];
     setMade(next); sfx.correct();
@@ -63,6 +70,7 @@ export function ShadowOverlay({ onDone }: { onDone: (stars: number) => void }) {
     e.preventDefault();
     const who = e.shiftKey ? 'earth' : 'moon';
     const n = (p: { x: number; y: number }) => ({ x: cl(p.x + v[0], BASE.x0, BASE.x1), y: cl(p.y + v[1], BASE.y0, BASE.y1) });
+    live.current[who] = n(live.current[who]);
     if (who === 'earth') setEarth(n); else setMoon(n);
   };
 

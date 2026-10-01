@@ -1,4 +1,4 @@
-export type Phase = 'title' | 'intro' | 'board' | 'room' | 'result' | 'ending' | 'summary';
+export type Phase = 'title' | 'intro' | 'board' | 'room' | 'result' | 'finale' | 'ending' | 'summary';
 
 export interface Body { id: string; name: string }
 export interface Trait { id: string; body: string; text: string; page: number }

@@ -24,6 +24,7 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
   const [good, setGood] = useState<SkyDirection[]>([]);
   const svg = useRef<SVGSVGElement>(null);
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  const lastPt = useRef<{ x: number; y: number } | null>(null); // 손을 뗄 때 최신 끝점으로 판정
   const [line, setLine] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const dir = ORDER[idx];
 
@@ -46,20 +47,23 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
     if (best < 0) return;
     const q = pos(best);
     drag.current = { x: q.x, y: q.y, ox: p.x, oy: p.y };
+    lastPt.current = { x: q.x, y: q.y };
     setLine({ x1: q.x, y1: q.y, x2: q.x, y2: q.y });
   };
   const move = (e: PointerEvent<SVGSVGElement>) => {
     const d = drag.current; if (!d) return;
     const p = toSvg(e);
+    lastPt.current = p;
     setLine({ x1: d.x, y1: d.y, x2: p.x, y2: p.y });
   };
   const up = () => {
     const d = drag.current; drag.current = null;
-    if (!d || !line) return;
-    const dx = line.x2 - line.x1, dy = line.y2 - line.y1;
+    const end = lastPt.current;
+    if (!d || !end) return;
+    const dx = end.x - d.x, dy = end.y - d.y;
     setLine(null);
     if (Math.hypot(dx, dy) < 50) return;
-    check(dx, dy, { x: line.x1, y: line.y1 }, { x: line.x2, y: line.y2 });
+    check(dx, dy, { x: d.x, y: d.y }, end);
   };
   const check = (dx: number, dy: number, from: { x: number; y: number }, to: { x: number; y: number }) => {
     const ok = dir === 'north' ? rotatesCounterclockwise(POLE, from, to) : starMotionOk(dir, dx, dy, cfg.dayStars.tolerance);
