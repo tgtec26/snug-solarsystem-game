@@ -2,6 +2,7 @@
 
 import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
+import { StarGlowDef, StarShape } from '@/components/StarShape';
 import { useDataStore } from '@/game/dataStore';
 import { isEastward, spinAccumulate, spinDone, starsFor } from '@/game/rules';
 
@@ -40,7 +41,7 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
   };
   const finish = () => {
     setOk(true); sfx.correct();
-    window.setTimeout(() => onDone(starsFor(1 / (1 + mistakes), mistakes === 0, cfg)), 1100);
+    window.setTimeout(() => onDone(starsFor(1 / (1 + mistakes), mistakes === 0, cfg)), 2500);
   };
   const toggle = () => {
     setView(v => (v === 'space' ? 'earth' : 'space'));
@@ -67,6 +68,7 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
     else if (e.key === 'Tab' || e.key === 'Enter') { e.preventDefault(); if (!e.repeat) toggle(); }
   };
 
+  const needView = spinDone(total, cfg.earthSpin.turns) && !viewed;
   const progress = Math.min(1, total / (cfg.earthSpin.turns * 360));
   const obs = { x: C.x + Math.cos(((rot - 90) * Math.PI) / 180) * R, y: C.y + Math.sin(((rot - 90) * Math.PI) / 180) * R };
   const shift = (((total * 2.2) % 800) + 800) % 800; // 지구 시점: 별이 동쪽에서 서쪽(왼쪽에서 오른쪽)로 흐른다
@@ -92,21 +94,21 @@ export function EarthSpinOverlay({ onDone }: { onDone: (stars: number) => void }
           </>
         ) : (
           <>
-            <rect x="0" y="0" width="800" height="420" fill="#0a1024" />
-            {STARS.map((s, i) => <circle key={i} cx={(s.x + shift) % 800} cy={s.y} r={s.r} fill="#fff" opacity="0.85" />)}
-            <rect x="0" y="420" width="800" height="180" fill="#1f3b27" />
-            <ellipse cx="400" cy="420" rx="420" ry="26" fill="#2f5a3a" />
-            <circle cx="400" cy="500" r="16" fill="#fde68a" stroke="#92400e" strokeWidth="4" />
-            <text x="40" y="404" fontSize="26" fontWeight="700" fill="#fde68a">동</text>
-            <text x="744" y="404" fontSize="26" fontWeight="700" fill="#fde68a">서</text>
+            <defs><StarGlowDef /></defs>
+            <image href="/assets/sky/sky-south.webp" x="0" y="0" width="800" height="600" preserveAspectRatio="xMidYMid slice" />
+            {STARS.map((s, i) => <StarShape key={i} x={(s.x + shift) % 800} y={s.y} r={s.r * 1.6} />)}
+            <g fontSize="26" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="5" paintOrder="stroke">
+              <text x="26" y="560">동쪽</text>
+              <text x="774" y="560" textAnchor="end">서쪽</text>
+            </g>
             <path d="M300 120 H500 m-24 -16 l24 16 l-24 16" stroke="#fde68a" strokeWidth="6" fill="none" strokeLinecap="round" opacity={ok ? 0 : 0.8} />
           </>
         )}
-        {ok && <circle cx={C.x} cy={C.y} r={R} fill="#fde68a" className="anim-sparkle" style={{ transformOrigin: `${C.x}px ${C.y}px` }} />}
+        {ok && view === 'space' && <circle cx={C.x} cy={C.y} r={R} fill="#fde68a" className="anim-sparkle" style={{ transformOrigin: `${C.x}px ${C.y}px` }} />}
       </svg>
       <div className="flex items-center gap-6 h-16">
-        <button type="button" onClick={toggle} className="px-8 py-3 rounded-2xl bg-sky-300 text-black text-2xl font-bold">시점 바꾸기</button>
-        <div className="text-xl text-red-300 w-[28rem]">{msg}</div>
+        <button type="button" onClick={toggle} className={`px-8 py-3 rounded-2xl bg-sky-300 text-black text-2xl font-bold ${needView ? 'animate-pulse ring-4 ring-yellow-200' : ''}`}>시점 바꾸기</button>
+        <div className={`text-xl w-[28rem] ${msg ? 'text-red-300' : 'text-yellow-100'}`} style={{ wordBreak: 'keep-all' }}>{msg || (needView ? '한 바퀴 돌렸어요! 시점을 바꿔 지구에서 본 하늘을 봐요' : '')}</div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { sfx } from '@snug/shared/src/audio';
 import { useRef, useState, type PointerEvent } from 'react';
+import { StarGlowDef, StarShape } from '@/components/StarShape';
 import { useDataStore } from '@/game/dataStore';
 import { rotatesCounterclockwise, starMotionOk, starsFor, type SkyDirection } from '@/game/rules';
 
@@ -18,17 +19,6 @@ const clock = (h: number, short = false) => {
   const n = t % 12 === 0 ? 12 : t % 12;
   return short ? `${n}시` : `${t >= 20 || t < 5 ? '밤' : '새벽'} ${n}시`;
 };
-/** 별 모양: 가는 네 갈래 빛줄기와 번지는 빛 */
-function StarShape({ x, y, r, ring = false }: { x: number; y: number; r: number; ring?: boolean }) {
-  const R = r * 2.4, q = r * 0.5;
-  return (
-    <g>
-      <circle cx={x} cy={y} r={r * 3.2} fill="url(#starGlow)" />
-      <path d={`M${x} ${y - R} L${x + q * 0.6} ${y - q * 0.6} L${x + R} ${y} L${x + q * 0.6} ${y + q * 0.6} L${x} ${y + R} L${x - q * 0.6} ${y + q * 0.6} L${x - R} ${y} L${x - q * 0.6} ${y - q * 0.6} Z`} fill="#fffbe6" stroke="#fde68a" strokeWidth="1" />
-      {ring && <circle cx={x} cy={y} r={R + 6} fill="none" stroke="#fde68a" strokeWidth="2" strokeDasharray="4 5" opacity="0.7" />}
-    </g>
-  );
-}
 const GRID = [[100, 420], [260, 330], [420, 400], [560, 300], [680, 420], [200, 200], [470, 210], [330, 470]];
 
 /** 하루 동안 별 (244~245쪽): 시간 슬라이더로 하늘을 움직여 본 뒤, 별을 끌어 이동 방향을 그린다. 북쪽은 북극성 둘레를 시계 반대로. */
@@ -90,15 +80,17 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
     if (Math.hypot(dx, dy) < 50) return;
     check(dx, dy, { x: d.x, y: d.y }, end);
   };
+  const select = (i: number) => { if (i === idx) return; setIdx(i); setHour(0); setMoved(false); setMsg(''); setLine(null); };
   const check = (dx: number, dy: number, from: { x: number; y: number }, to: { x: number; y: number }) => {
+    if (good.includes(dir)) return;
     const ok = dir === 'north' ? rotatesCounterclockwise(POLE, from, to) : starMotionOk(dir, dx, dy, cfg.dayStars.tolerance);
     if (!ok) { setMistakes(m => m + 1); sfx.error(); setMsg(dir === 'north' ? '북극성을 중심으로 시계 반대 방향이에요' : '별은 동쪽에서 떠서 서쪽으로 져요'); return; }
     setMsg('');
     const next = [...good, dir];
     setGood(next); sfx.correct();
     window.setTimeout(() => {
-      if (idx + 1 >= ORDER.length) onDone(starsFor(ORDER.length / (ORDER.length + mistakes), mistakes === 0, cfg));
-      else { setIdx(idx + 1); setHour(0); setMoved(false); }
+      if (next.length >= ORDER.length) onDone(starsFor(ORDER.length / (ORDER.length + mistakes), mistakes === 0, cfg));
+      else { const j = ORDER.findIndex((d, k) => k > idx && !next.includes(d)); select(j >= 0 ? j : ORDER.findIndex(d => !next.includes(d))); }
     }, 900);
   };
   const key = (e: React.KeyboardEvent) => {
@@ -115,15 +107,19 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
   };
   const done = good.includes(dir);
   const n = dir === 'north' ? STARS.length : GRID.length;
+  const hint = !moved && !done ? '① 아래 슬라이더를 오른쪽으로 움직여, 별이 어디로 가는지 봐요'
+    : done ? '잘했어요! 위에서 다른 방향의 하늘도 골라 봐요'
+    : dir === 'north' ? '② 별을 잡고, 북극성 둘레로 별이 움직인 방향대로 끌어서 선을 그려요'
+    : '② 별을 잡고, 별이 움직인 방향대로 끌어서 선을 그려요';
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
       <div className="flex gap-3">
-        {ORDER.map((d, i) => <div key={d} className={`px-5 py-2 rounded-xl text-xl font-bold ${good.includes(d) ? 'bg-emerald-400 text-black anim-pop' : i === idx ? 'bg-yellow-300 text-black' : 'bg-white/10'}`}>{NAMES[d]}</div>)}
+        {ORDER.map((d, i) => <button type="button" key={d} onClick={() => select(i)} className={`px-5 py-2 rounded-xl text-xl font-bold ${good.includes(d) ? 'bg-emerald-400 text-black anim-pop' : i === idx ? 'bg-yellow-300 text-black' : 'bg-white/10'} ${i === idx ? 'ring-4 ring-white/70' : ''}`}>{NAMES[d]}</button>)}
       </div>
       <svg ref={svg} viewBox="0 0 800 600" width="800" height="600" className="touch-none rounded-3xl bg-[#05070f] outline-none" tabIndex={0} onKeyDown={key} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <defs>
-          <radialGradient id="starGlow"><stop offset="0" stopColor="#fff7c2" stopOpacity="0.85" /><stop offset="1" stopColor="#fde68a" stopOpacity="0" /></radialGradient>
+          <StarGlowDef />
         </defs>
         <rect x="0" y="0" width="800" height="600" fill="#05070f" />
         <image href={`/assets/sky/sky-${dir}.webp`} x="0" y="0" width="800" height="600" preserveAspectRatio="xMidYMid slice" />
@@ -155,7 +151,7 @@ export function DayStarsOverlay({ onDone }: { onDone: (stars: number) => void })
         </div>
         <svg viewBox="0 0 320 20" width="320" height="20" aria-hidden><line x1="6" y1="10" x2="300" y2="10" stroke="#fde68a" strokeWidth="3" strokeLinecap="round" /><polygon points="296,3 314,10 296,17" fill="#fde68a" /></svg>
         <div className="text-base text-white/80 -mt-1">시간의 흐름</div>
-        <div className="text-xl text-red-300 h-7">{msg}</div>
+        <div className={`text-xl h-7 w-[800px] text-center ${msg ? 'text-red-300' : 'text-yellow-100'}`} style={{ wordBreak: 'keep-all' }}>{msg || hint}</div>
       </div>
     </div>
   );
