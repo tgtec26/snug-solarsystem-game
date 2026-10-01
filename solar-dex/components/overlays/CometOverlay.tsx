@@ -40,7 +40,8 @@ export function CometOverlay({ onDone }: { onDone: (stars: number) => void }) {
     } else { setMistakes(m => m + 1); sfx.error(); setMsg('혜성 꼬리는 태양 반대쪽을 향해요'); }
   };
   const rad = (angle * Math.PI) / 180;
-  const len = 40 + tail.length * 28;
+  const len = 110 + tail.length * 60; // 꼬리 그림의 길이(상대값)
+  const imgW = len / 0.85, imgH = imgW / 3;
   const end = { x: comet.x + Math.cos(rad) * len, y: comet.y + Math.sin(rad) * len };
   const aimKey = (e: React.KeyboardEvent) => {
     if (e.repeat) return;
@@ -56,9 +57,12 @@ export function CometOverlay({ onDone }: { onDone: (stars: number) => void }) {
         <ellipse cx="400" cy="300" rx="240" ry="180" fill="none" stroke="#ffffff33" strokeDasharray="6 8" strokeWidth="3" />
         <image href="/assets/sun.webp" x={SUN.x - 52} y={SUN.y - 52} width="104" height="104" />
         <line x1={SUN.x} y1={SUN.y} x2={comet.x} y2={comet.y} stroke="#ffd16655" strokeWidth="2" strokeDasharray="4 6" />
-        <path d={`M${comet.x} ${comet.y} L${end.x} ${end.y}`} stroke={ok ? '#86efac' : '#7dd3fc'} strokeWidth="14" strokeLinecap="round" opacity="0.7" />
-        <circle cx={comet.x} cy={comet.y} r="14" fill="#e0f2fe" />
-        <circle cx={end.x} cy={end.y} r="18" fill="#ffffff" stroke="#fbbf24" strokeWidth="4" className={ok ? 'anim-pop' : ''} style={{ transformOrigin: `${end.x}px ${end.y}px` }} />
+        {/* 꼬리 그림: 머리가 혜성 위치, 꼬리는 잡은 방향으로 */}
+        <g transform={`rotate(${angle} ${comet.x} ${comet.y})`}>
+          <image href="/assets/comet-tail.webp" x={comet.x - imgW * 0.078} y={comet.y - imgH * 0.52} width={imgW} height={imgH} className="pointer-events-none" />
+        </g>
+        {/* 잡는 손잡이: 혜성의 일부가 아니므로 반투명 */}
+        <circle cx={end.x} cy={end.y} r="20" fill="#ffffff" fillOpacity="0.28" stroke="#fbbf24" strokeOpacity="0.8" strokeWidth="4" strokeDasharray="6 5" className={ok ? 'anim-pop' : ''} style={{ transformOrigin: `${end.x}px ${end.y}px` }} />
         {ok && <circle cx={comet.x} cy={comet.y} r="30" fill="#fde68a" className="anim-sparkle" style={{ transformOrigin: `${comet.x}px ${comet.y}px` }} />}
       </svg>
       <div className="flex items-center gap-6">
