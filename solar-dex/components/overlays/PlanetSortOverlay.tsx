@@ -68,6 +68,8 @@ export function PlanetSortOverlay({ onDone }: { onDone: (stars: number) => void 
           <button key={p.id} type="button" {...bindCard(p.id)}
             className={`w-32 rounded-2xl p-2 flex flex-col items-center gap-1 touch-none cursor-grab text-black ${selected === p.id ? 'bg-yellow-300 ring-4 ring-yellow-100' : 'bg-yellow-100'}`}
             style={{ opacity: drag?.id === p.id ? 0.3 : 1 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/assets/icons/planet-${p.id}.webp`} alt="" width={64} height={64} draggable={false} className="pointer-events-none" />
             <div className="font-bold text-lg">{p.name}</div>
             {on.map(c => <div key={c} className="text-xs bg-black/10 rounded px-1">{valueLabel(p.id, c)}</div>)}
           </button>

@@ -15,9 +15,12 @@ import { ResultOverlay } from '@/components/overlays/ResultOverlay';
 /** 화면이 바뀐 직후 연타가 다음 화면으로 넘어가지 않도록 입력을 잠깐 잠근다 */
 export const inputLock = createInputLock();
 
+const ROOM_BG: Record<string, string> = {"library": "library", "planetHall": "planet-hall", "sunDeck": "sun-deck"};
+
 export function UIOverlay() {
   const phase = useGameStore(s => s.phase);
   const lockMs = useDataStore(s => s.minigame?.inputLockMs ?? 1000);
+  const room = useGameStore(s => s.orders.find(o => o.id === s.current)?.room);
   const first = useRef(true);
   const [muted, setMuted] = useState(isMuted());
 
@@ -26,8 +29,11 @@ export function UIOverlay() {
     inputLock.lock(lockMs);
   }, [phase, lockMs]);
 
+  // 의뢰판은 천문대 벽, 방 안은 그 방 배경. 그림이 없으면 기본 그라데이션만 보인다.
+  const bg = phase === 'board' ? 'observatory-wall' : phase === 'room' && room ? ROOM_BG[room] : undefined;
+  const base = 'radial-gradient(ellipse at 50% 120%, #1c2a5a 0%, #0a0f25 55%, #04060f 100%)';
   return (
-    <div className="absolute inset-0 text-white select-none" style={{ background: 'radial-gradient(ellipse at 50% 120%, #1c2a5a 0%, #0a0f25 55%, #04060f 100%)' }}>
+    <div className="absolute inset-0 text-white select-none" style={{ background: bg ? `linear-gradient(rgba(4,6,15,0.62), rgba(4,6,15,0.62)), url(/assets/bg/${bg}.webp) center / cover, ${base}` : base }}>
       <button
         type="button"
         aria-label="전체 화면"

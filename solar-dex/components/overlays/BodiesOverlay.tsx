@@ -45,16 +45,10 @@ export function BodiesOverlay({ onDone }: { onDone: (stars: number) => void }) {
             type="button"
             data-drop={b.id}
             onClick={() => placeSelected(b.id)}
-            className={`h-56 rounded-2xl border-2 p-3 flex flex-col items-center gap-2 ${selected ? 'border-yellow-300 bg-yellow-200/10' : 'border-white/30 bg-white/5'} ${flash?.id === b.id ? (flash.ok ? 'anim-pop' : 'anim-shake') : ''}`}
+            className={`h-56 rounded-2xl border-2 p-3 flex flex-col items-center gap-2 ${selected ? 'border-yellow-300 bg-yellow-200/10' : 'border-white/30 bg-black/40'} ${flash?.id === b.id ? (flash.ok ? 'anim-pop' : 'anim-shake') : ''}`}
           >
-            <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden>
-              {b.id === 'sun' && <circle cx="32" cy="32" r="22" fill="#ffd166" />}
-              {b.id === 'planet' && <><circle cx="32" cy="32" r="20" fill="#5aa9e6" /><ellipse cx="32" cy="32" rx="30" ry="8" fill="none" stroke="#cbd5e1" strokeWidth="2" /></>}
-              {b.id === 'dwarf' && <circle cx="32" cy="32" r="10" fill="#c9a27e" />}
-              {b.id === 'asteroid' && <polygon points="14,36 22,16 40,12 52,30 44,50 24,50" fill="#8d8d99" />}
-              {b.id === 'comet' && <><circle cx="44" cy="32" r="9" fill="#e0f2fe" /><path d="M36 28 L6 18 L6 46 L36 36Z" fill="#7dd3fc" opacity="0.6" /></>}
-              {b.id === 'moon' && <circle cx="32" cy="32" r="18" fill="#d1d5db" />}
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/assets/icons/body-${b.id}.webp`} alt="" width={64} height={64} draggable={false} className="pointer-events-none" />
             <div className="text-xl font-bold">{b.name}</div>
             <div className="flex flex-col gap-1 w-full">
               {(placed[b.id] ?? []).map(id => <div key={id} className="text-sm bg-emerald-500/40 rounded px-1">{text(id)}</div>)}
