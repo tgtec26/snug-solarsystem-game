@@ -118,34 +118,32 @@ export function TelescopeOverlay({ onDone }: { onDone: (stars: number) => void }
         <defs>
           <clipPath id="view"><circle cx={C.x} cy={C.y} r={VIEW_R} /></clipPath>
           <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation={blur} /></filter>
-          <radialGradient id="moonG" cx="0.35" cy="0.4"><stop offset="0" stopColor="#f4f1e6" /><stop offset="1" stopColor="#a9a596" /></radialGradient>
-          <radialGradient id="planetG" cx="0.35" cy="0.35"><stop offset="0" stopColor="#f3c58b" /><stop offset="1" stopColor="#9a5b2b" /></radialGradient>
         </defs>
         {/* 밤하늘 (별은 경통을 따라 움직인다) */}
         {Array.from({ length: 40 }).map((_, i) => <circle key={i} cx={(i * 97) % 800 + (inView ? 0 : pan.x * 0.15)} cy={(i * 61) % 600 + (inView ? 0 : pan.y * 0.15)} r={i % 5 === 0 ? 2 : 1.2} fill="#fff" opacity="0.6" />)}
-        {stage !== 'focus' && stage !== 'shot' && <circle cx={sunScreen.x} cy={sunScreen.y} r="50" fill="#ffd166" opacity="0.9" />}
+        {stage !== 'focus' && stage !== 'shot' && <image href="/assets/sun.webp" x={sunScreen.x - 50} y={sunScreen.y - 50} width="100" height="100" />}
         {/* 경통 그림자: 기울면 바닥에 길게 드리운다 */}
         <ellipse cx={400 + pan.x * -0.3} cy="560" rx={120 + Math.abs(pan.x) * 0.3} ry="14" fill="#000" opacity="0.5" />
         {/* 파인더 시야 */}
         <g clipPath="url(#view)">
           <rect x="0" y="0" width="800" height="600" fill="#0a1024" />
-          {!inView && <circle cx={sunScreen.x} cy={sunScreen.y} r="50" fill="#ffd166" />}
+          {!inView && <image href="/assets/sun.webp" x={sunScreen.x - 50} y={sunScreen.y - 50} width="100" height="100" />}
           <g filter={inView ? 'url(#blur)' : undefined} className={stage === 'shot' ? 'anim-pop' : ''} style={{ transformOrigin: `${tx}px ${ty}px` }}>
             {target.kind === 'moon' ? (
               <>
-                <circle cx={tx} cy={ty} r={r} fill="url(#moonG)" />
+                <image href="/assets/moon-ball.webp" x={tx - r} y={ty - r} width={r * 2} height={r * 2} />
                 <path d={`M${tx} ${ty - r} A${r} ${r} 0 0 0 ${tx} ${ty + r} A${r * 0.45} ${r} 0 0 1 ${tx} ${ty - r}`} fill="#0a1024" opacity="0.85" />
-                {inView && [[-12, -25, 9], [-28, 10, 13], [-6, 32, 7], [-38, -20, 6]].map(([cx, cy, cr], i) => <circle key={i} cx={tx + cx} cy={ty + cy} r={cr} fill="#8c8878" opacity="0.8" />)}
               </>
             ) : (
               <>
-                <circle cx={tx} cy={ty} r={r} fill="url(#planetG)" />
-                {inView && [-20, 0, 20].map(o => <ellipse key={o} cx={tx} cy={ty + o} rx={r - Math.abs(o) * 0.3} ry="5" fill="#fff" opacity="0.18" />)}
-                <ellipse cx={tx} cy={ty} rx={r + 30} ry="12" fill="none" stroke="#e8d3a8" strokeWidth="5" opacity="0.8" transform={`rotate(-18 ${tx} ${ty})`} />
+                <image href="/assets/saturn.webp" x={tx - 118} y={ty - 78} width="236" height="156" />
               </>
             )}
           </g>
         </g>
+        {/* 이름표: 어느 것이 태양이고 무엇을 찍는지 글자로 알려 준다 */}
+        {stage !== 'focus' && stage !== 'shot' && <text x={sunScreen.x} y={sunScreen.y - 62} textAnchor="middle" fontSize="26" fontWeight="700" fill="#fde68a" stroke="#05070f" strokeWidth="5" paintOrder="stroke">태양</text>}
+        {stage !== 'cap' && (inView || distance(pos, C) < VIEW_R) && <text x={inView ? C.x : pos.x} y={(inView ? C.y : pos.y) + r + 36} textAnchor="middle" fontSize="28" fontWeight="700" fill="#fff" stroke="#05070f" strokeWidth="5" paintOrder="stroke">{target.kind === 'moon' ? '달' : '행성'}</text>}
         <circle cx={C.x} cy={C.y} r={VIEW_R} fill="none" stroke="#94a3b8" strokeWidth="10" />
         {/* 십자선과 맞춤 원 */}
         <g stroke="#fde68a" strokeWidth="2" opacity="0.9">
