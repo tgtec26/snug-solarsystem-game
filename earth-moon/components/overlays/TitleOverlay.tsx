@@ -29,12 +29,17 @@ export function TitleOverlay() {
         <div className="relative -mt-2 w-[340px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/title/title-ribbon.webp" alt="" draggable={false} className="w-full pointer-events-none" />
-          <div className="absolute left-0 right-0 top-[62%] -translate-y-1/2 flex items-center justify-center text-2xl font-bold text-yellow-100 tracking-wide" style={{ textShadow: '0 2px 6px #000' }}>지구와 달 모형</div>
+          <svg viewBox="0 0 340 113" className="absolute inset-0 w-full h-full pointer-events-none" aria-label="지구와 달 모형">
+            <defs><path id="ribbon-curve" d="M40 70 Q170 84 300 70" /></defs>
+            <text fontSize="25" fontWeight="700" fill="#fef9c3" stroke="#0a1024" strokeWidth="4" paintOrder="stroke" textAnchor="middle" letterSpacing="1">
+              <textPath href="#ribbon-curve" startOffset="50%">지구와 달 모형</textPath>
+            </text>
+          </svg>
         </div>
         <div className="relative mt-3 w-[300px] title-pulse">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/title/title-button.webp" alt="" draggable={false} className="w-full pointer-events-none" />
-          <div className="absolute left-0 right-0 top-[69%] -translate-y-1/2 flex items-center justify-center text-2xl font-bold text-[#3b2400]">화면을 눌러 시작</div>
+          <div className="absolute left-0 right-0 top-[66%] -translate-y-1/2 flex items-center justify-center text-2xl font-bold text-[#3b2400]">화면을 눌러 시작</div>
         </div>
       </div>
     </button>
