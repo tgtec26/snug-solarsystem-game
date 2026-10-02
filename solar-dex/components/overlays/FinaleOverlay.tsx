@@ -16,7 +16,7 @@ export function FinaleOverlay() {
   const [shown, setShown] = useState(0);
 
   useEffect(() => {
-    const t1 = window.setTimeout(() => { setStep(1); sfx.success(); }, 700);
+    const t1 = window.setTimeout(() => { setStep(1); sfx.fanfare(); }, 700);
     const t2 = window.setTimeout(() => setStep(2), 1500);
     const t3 = window.setTimeout(() => next(), 4600);
     return () => { window.clearTimeout(t1); window.clearTimeout(t2); window.clearTimeout(t3); };

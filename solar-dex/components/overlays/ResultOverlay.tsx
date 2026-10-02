@@ -20,7 +20,7 @@ export function ResultOverlay({ summary = false }: { summary?: boolean }) {
   const last = orders.find(o => o.id === current);
   const card = useRef<HTMLDivElement>(null);
   const [saveMsg, setSaveMsg] = useState('');
-  useEffect(() => { if (summary) sfx.ending(); else sfx.success(); }, [summary]);
+  useEffect(() => { if (!summary) sfx.success(); }, [summary]);
   const total = Object.values(stars).reduce((a, b) => a + b, 0);
   const [shown, setShown] = useState(0); // 별 개수 카운트업
   useEffect(() => {

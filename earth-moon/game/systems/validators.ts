@@ -1,4 +1,5 @@
 import { isNum, isStr } from '@snug/shared/src/validate';
+import { validateAudioConfig } from '@snug/shared/src/audio';
 import type { DialogConfig, MinigameConfig, MoonData, Order, SkyData } from '@/game/types';
 
 // 247쪽 그림 VII-8: 월별 황도 12궁 배열
@@ -89,7 +90,7 @@ export function validateMinigame(c: MinigameConfig): string[] {
   return errs;
 }
 
-export const DATA_FILES = ['sky', 'moon', 'orders', 'dialog-config', 'minigame-config'] as const;
+export const DATA_FILES = ['sky', 'moon', 'orders', 'dialog-config', 'minigame-config', 'audio-config'] as const;
 export type DataFile = typeof DATA_FILES[number];
 export const VALIDATORS: Record<DataFile, (v: never) => string[]> = {
   'sky': validateSky as (v: never) => string[],
@@ -97,4 +98,5 @@ export const VALIDATORS: Record<DataFile, (v: never) => string[]> = {
   'orders': validateOrders as (v: never) => string[],
   'dialog-config': validateDialog as (v: never) => string[],
   'minigame-config': validateMinigame as (v: never) => string[],
+  'audio-config': validateAudioConfig as (v: never) => string[],
 };

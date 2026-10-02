@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createInputLock } from '@snug/shared/src/inputLock';
 import { toggleFullscreen } from '@snug/shared/src/fullscreen';
-import { isMuted, toggleMute } from '@snug/shared/src/audio';
+import { armAutoUnlock, isMuted, music, toggleMute } from '@snug/shared/src/audio';
 import { useGameStore } from '@/game/store';
 import { useDataStore } from '@/game/dataStore';
 import { TitleOverlay } from '@/components/overlays/TitleOverlay';
@@ -29,6 +29,9 @@ export function UIOverlay() {
     if (first.current) { first.current = false; return; }
     inputLock.lock(lockMs);
   }, [phase, lockMs]);
+
+  useEffect(() => { music.setScene(phase); }, [phase]);
+  useEffect(() => armAutoUnlock(), []);
 
   // 의뢰판은 천문대 벽, 방 안은 그 방 배경. 그림이 없으면 기본 그라데이션만 보인다.
   const SCENE: Partial<Record<string, string>> = { intro: 'intro-hall', result: 'observatory-wall', ending: 'ending-roof', summary: 'ending-roof' };

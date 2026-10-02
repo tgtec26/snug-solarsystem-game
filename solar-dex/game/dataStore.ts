@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { BodiesData, DialogConfig, MinigameConfig, Order, SunData } from '@/game/types';
+import { configureAudio, type AudioConfig } from '@snug/shared/src/audio';
 import { VALIDATORS, type DataFile } from '@/game/systems/validators';
 
 interface DataState {
@@ -24,6 +25,7 @@ export const useDataStore = create<DataState>()((set) => ({
         getJson<BodiesData>('bodies'), getJson<SunData>('sun'), getJson<Order[]>('orders'),
         getJson<DialogConfig>('dialog-config'), getJson<MinigameConfig>('minigame-config'),
       ]);
+      configureAudio(await getJson<AudioConfig>('audio-config'));
       set({ bodies, sun, orders, dialog, minigame, loaded: true, error: null });
     } catch (e) {
       set({ error: String(e), loaded: true });

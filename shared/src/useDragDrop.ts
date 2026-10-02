@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { sfx } from './audio';
 
 export interface DragState { id: string; x: number; y: number }
 
@@ -50,7 +51,7 @@ export function useDragDrop(onDrop: (cardId: string, targetId: string) => void, 
     setDrag(null);
     setOver(null);
     if (!s) return;
-    if (!s.moved) { if (!cancel) setSelected(cur => (cur === s.id ? null : s.id)); return; }
+    if (!s.moved) { if (!cancel) { setSelected(cur => (cur === s.id ? null : s.id)); sfx.pickup(); } return; }
     if (cancel) return;
     const target = pickTarget(x, y, latest.current.ghost);
     if (target) { setSelected(null); latest.current.onDrop(s.id, target); }
@@ -65,7 +66,7 @@ export function useDragDrop(onDrop: (cardId: string, targetId: string) => void, 
         const st = start.current;
         if (!st) return;
         if (ev.pointerType === 'mouse' && ev.buttons === 0) { finish(ev.clientX, ev.clientY, false); return; } // 놓친 마우스 뗌
-        if (!st.moved && Math.hypot(ev.clientX - st.x, ev.clientY - st.y) > 8) st.moved = true;
+        if (!st.moved && Math.hypot(ev.clientX - st.x, ev.clientY - st.y) > 8) { st.moved = true; sfx.pickup(); }
         if (st.moved) { setDrag({ id, x: ev.clientX, y: ev.clientY }); setOver(pickTarget(ev.clientX, ev.clientY, latest.current.ghost)); }
       };
       const up = (ev: globalThis.PointerEvent) => finish(ev.clientX, ev.clientY, false);

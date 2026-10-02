@@ -1,0 +1,20 @@
+{
+  "volumes": { "bgm": 0.25, "sfx": 1 },
+  "bgm": {
+    "title": "start_ending.mp3",
+    "intro": "start_ending.mp3",
+    "board": "quiz-background.mp3",
+    "room": "quiz-background.mp3",
+    "result": "quiz-background.mp3",
+    "finale": "",
+    "ending": "start_ending.mp3",
+    "summary": "start_ending.mp3"
+  },
+  "sfx": {
+    "correct": { "file": "correct.mp3", "volume": 0.7 },
+    "error": { "file": "error.mp3", "volume": 0.5 },
+    "success": { "file": "success.mp3", "volume": 0.7 },
+    "fanfare": { "file": "770801_fanfare.mp3", "volume": 0.7 },
+    "pickup": { "file": "book_pickup.mp3", "volume": 0.5 }
+  }
+}

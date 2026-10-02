@@ -1,4 +1,5 @@
 import { isNum, isStr } from '@snug/shared/src/validate';
+import { validateAudioConfig } from '@snug/shared/src/audio';
 import type { BodiesData, DialogConfig, MinigameConfig, Order, SunData } from '@/game/types';
 
 const PLANET_IDS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
@@ -98,7 +99,7 @@ export function validateMinigame(c: MinigameConfig): string[] {
   return errs;
 }
 
-export const DATA_FILES = ['bodies', 'sun', 'orders', 'dialog-config', 'minigame-config'] as const;
+export const DATA_FILES = ['bodies', 'sun', 'orders', 'dialog-config', 'minigame-config', 'audio-config'] as const;
 export type DataFile = typeof DATA_FILES[number];
 export const VALIDATORS: Record<DataFile, (v: never) => string[]> = {
   'bodies': validateBodies as (v: never) => string[],
@@ -106,4 +107,5 @@ export const VALIDATORS: Record<DataFile, (v: never) => string[]> = {
   'orders': validateOrders as (v: never) => string[],
   'dialog-config': validateDialog as (v: never) => string[],
   'minigame-config': validateMinigame as (v: never) => string[],
+  'audio-config': validateAudioConfig as (v: never) => string[],
 };
