@@ -140,6 +140,8 @@ export function PortfolioSubmitter(props: {
   const [previewUrl, setPreviewUrl] = useState('');
   const previewBlob = useRef<Blob | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const previewRevision = useRef(0);
+  const mounted = useRef(true);
   const portfolioBaseUrl = DEFAULT_PORTFOLIO_BASE_URL;
 
   useEffect(() => {
@@ -164,6 +166,12 @@ export function PortfolioSubmitter(props: {
   }, [portfolioBaseUrl]);
 
   useEffect(() => () => {
+    mounted.current = false;
+    previewRevision.current += 1;
+    abortRef.current?.abort();
+  }, []);
+
+  useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
 
@@ -175,6 +183,10 @@ export function PortfolioSubmitter(props: {
   const ready = !!destination && numbers.length > 0 && !props.disabled;
 
   function resetConfirmation() {
+    previewRevision.current += 1;
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setBusy(false);
     setConfirmed(false);
     setStatus('');
     previewBlob.current = null;
@@ -187,10 +199,12 @@ export function PortfolioSubmitter(props: {
   async function submit() {
     if (!ready || busy || !destination) return;
     if (!confirmed) {
+      const requestRevision = previewRevision.current;
       setBusy(true);
       setStatus('PNG 미리보기를 만드는 중입니다.');
       try {
         const blob = await props.createPngBlob();
+        if (!mounted.current || requestRevision !== previewRevision.current) return;
         previewBlob.current = blob;
         setPreviewUrl((current) => {
           if (current) URL.revokeObjectURL(current);
@@ -199,9 +213,10 @@ export function PortfolioSubmitter(props: {
         setConfirmed(true);
         setStatus('대상과 PNG 미리보기를 확인했습니다. 한 번 더 누르면 전송합니다.');
       } catch (error) {
+        if (!mounted.current || requestRevision !== previewRevision.current) return;
         setStatus(`PNG 미리보기 실패: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
-        setBusy(false);
+        if (mounted.current) setBusy(false);
       }
       return;
     }
