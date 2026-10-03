@@ -3,7 +3,8 @@
 import { Star } from '@snug/shared/src/Star';
 import { useEffect, useRef, useState } from 'react';
 import { sfx } from '@snug/shared/src/audio';
-import { saveCard } from '@snug/shared/src/saveCard';
+import { cardBlob, saveCard } from '@snug/shared/src/saveCard';
+import { PortfolioSubmitter } from '@snug/shared/src/PortfolioSubmitter';
 import { Confetti } from '@snug/shared/src/Confetti';
 import { useGameStore } from '@/game/store';
 import { inputLock } from '@/components/UIOverlay';
@@ -42,6 +43,17 @@ export function ResultOverlay({ summary = false }: { summary?: boolean }) {
             <div className="flex gap-4 mt-4" data-no-capture="1">
               <button type="button" className="px-8 py-4 rounded-2xl bg-sky-300 text-black text-2xl font-bold" onClick={async () => { if (card.current) setSaveMsg((await saveCard(card.current, 'solar-dex-result.png')) ? '' : '저장하지 못했어요'); }}>나의 결과 내려받기</button>
               <button type="button" className="px-10 py-4 rounded-2xl bg-yellow-300 text-black text-2xl font-bold" onClick={() => { if (!inputLock.isLocked()) restart(); }}>다시 하기</button>
+            </div>
+            <div className="w-full" data-no-capture="1">
+              <PortfolioSubmitter
+                title="태양계 도감 관측 결과"
+                description={`태양계 도감 게임 결과: 의뢰 ${completed.length}/${orders.length}, 별 ${total}개`}
+                idempotencyPrefix="solar-dex"
+                createPngBlob={async () => {
+                  if (!card.current) throw new Error('결과 카드를 찾지 못했습니다.');
+                  return await cardBlob(card.current);
+                }}
+              />
             </div>
             <div className="h-6 text-lg text-red-300">{saveMsg}</div>
           </>
